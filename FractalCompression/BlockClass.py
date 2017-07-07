@@ -10,7 +10,7 @@ class Block:
         self.coor_y = i * size
         # Коэффицент преобразования
         self.coeff = rotate
-
+        self.DecompressionShift = 0
         area = (j * size, i * size, (j + 1) * size, (i + 1) * size)
 
         self.Blockimage = image.crop(area)
@@ -40,3 +40,7 @@ class Block:
     # Вывод изображения
     def Show(self):
         self.Blockimage.show()
+
+    # Функция для задания сдвига по яркости
+    def SetShift(self, shift):
+        self.DecompressionShift = shift

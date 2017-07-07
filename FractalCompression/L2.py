@@ -14,21 +14,21 @@ class L2:
             RangePixels = RangeBlock.Blockimage.load()  # Выгружаем значения пикселей.
             DomainPixels = DomainBlock.Blockimage.load()
             # Вычисление сдвига по яркости
+            DomainValue = 0
+            RangeValue = 0
             for i in range(width):
                 for j in range(height):
                     # Доменные пиксели берем через один
-                    a = DomainPixels[i * 2, j * 2][0]
-                    b = DomainPixels[i * 2, j * 2][1]
-                    c = DomainPixels[i * 2, j * 2][2]
-                    DomainValue = 0.75 * (a + b + c)
+                    R = DomainPixels[i * 2, j * 2][0]
+                    G = DomainPixels[i * 2, j * 2][1]
+                    B = DomainPixels[i * 2, j * 2][2]
+                    DomainValue = DomainValue + 0.75 * (R + G + B)
 
-            for i in range(width):
-                for j in range(height):
                     # Значения пикселей рангового блока
                     a = RangePixels[i, j][0]
                     b = RangePixels[i, j][1]
                     c = RangePixels[i, j][2]
-                    RangeValue = (a + b + c)
+                    RangeValue = RangeValue + (R + G + B)
 
             Shift = (DomainValue - RangeValue) / (width * height)
             return Shift
@@ -45,16 +45,16 @@ class L2:
             for i in range(width):
                 for j in range(height):
                     # Перебираем все значения ранговых пикселей
-                    a = RangePixels[i, j][0]
-                    b = RangePixels[i, j][1]
-                    c = RangePixels[i, j][2]
-                    RangeValue = (a + b + c)
+                    R = RangePixels[i, j][0]
+                    G = RangePixels[i, j][1]
+                    B = RangePixels[i, j][2]
+                    RangeValue = (R + G + B)
 
                     # Доменные пиксели берем через один
                     a = DomainPixels[i * 2, j * 2][0]
                     b = DomainPixels[i * 2, j * 2][1]
                     c = DomainPixels[i * 2, j * 2][2]
-                    DomainValue = (a + b + c)
+                    DomainValue = (R + G + B)
 
                     #Dist = Dist + (RangeValue + self.Shift(RangeBlock, DomainBlock) - 0.75 * DomainValue) ** 2
                     Dist = Dist + (RangeValue + shift - 0.75 * DomainValue) ** 2
