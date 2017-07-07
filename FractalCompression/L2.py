@@ -25,9 +25,9 @@ class L2:
                     DomainValue = DomainValue + 0.75 * (R + G + B)
 
                     # Значения пикселей рангового блока
-                    a = RangePixels[i, j][0]
-                    b = RangePixels[i, j][1]
-                    c = RangePixels[i, j][2]
+                    R = RangePixels[i, j][0]
+                    G = RangePixels[i, j][1]
+                    B = RangePixels[i, j][2]
                     RangeValue = RangeValue + (R + G + B)
 
             Shift = (DomainValue - RangeValue) / (width * height)
@@ -51,9 +51,9 @@ class L2:
                     RangeValue = (R + G + B)
 
                     # Доменные пиксели берем через один
-                    a = DomainPixels[i * 2, j * 2][0]
-                    b = DomainPixels[i * 2, j * 2][1]
-                    c = DomainPixels[i * 2, j * 2][2]
+                    R = DomainPixels[i * 2, j * 2][0]
+                    G = DomainPixels[i * 2, j * 2][1]
+                    B = DomainPixels[i * 2, j * 2][2]
                     DomainValue = (R + G + B)
 
                     #Dist = Dist + (RangeValue + self.Shift(RangeBlock, DomainBlock) - 0.75 * DomainValue) ** 2
