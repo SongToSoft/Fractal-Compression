@@ -98,7 +98,8 @@ class Coder:
         #print(range_size)
         # Создаём изображение
 
-        newimage = Image.new("RGB", (width, height), (0, 0, 0))
+        #newimage = Image.new("RGB", (width, height), (255, 255, 255))
+        newimage = Image.open("Expanded file.png")
         range_num_width = width // range_size
         range_num_height = height // range_size
 
@@ -112,7 +113,7 @@ class Coder:
             for j in range(range_num_height):
                 # Создаем ранговые блоки
                 RangeBlock = BlockClass.Block(newimage, range_size, i, j, 0)
-                # RangeBlock.Show()
+                #RangeBlock.Show()
                 RangeBlockList.append(RangeBlock)
         RangeBlockList.reverse()  # Разворачиваем список
 
@@ -128,9 +129,11 @@ class Coder:
                 count = count + 1
                 current_shift = (float)(String[count])
                 count = count + 1
+                #print(str(current_x) + ' ' + str(current_y) + ' ' + str(current_rotate) + ' ' + str(current_shift))
+                # Не работают доменныые блоки!!!!! Неправильно захватывают изображение
                 DomainBlock = BlockClass.Block(newimage, domain_size, current_x, current_y, current_rotate)
                 DomainBlock.SetShift(current_shift)
-                # DomainBlock.Show()
+                #DomainBlock.Show()
                 DomainBlockList.append(DomainBlock)
         DomainBlockList.reverse()
 
@@ -151,8 +154,8 @@ class Coder:
                     G = (int)(0.75 * DomainPixels[i * 2, j * 2][1]) + (int)(DomainBlock.DecompressionShift)
                     B = (int)(0.75 * DomainPixels[i * 2, j * 2][2]) + (int)(DomainBlock.DecompressionShift)
                     draw.point((i, j), (R, G, B))
-            # Тут явная ошибка!!!!
-            FinalRangeBlock = BlockClass.Block(Bufferimage, range_size, RangeBlock.coor_x, RangeBlock.coor_y, 0)
+            FinalRangeBlock = BlockClass.Block(Bufferimage, range_size, 0, 0, 0)
+            FinalRangeBlock.SerCoordinate(RangeBlock.coor_x, RangeBlock.coor_y)
             FinalRangeBlockList.append(FinalRangeBlock)
         FinalRangeBlockList.reverse()
 
@@ -163,8 +166,8 @@ class Coder:
             FinalRangePixels = FinalRangeBlock.Blockimage.load()
             current_x = FinalRangeBlock.coor_x
             current_y = FinalRangeBlock.coor_y
-            print(current_x)
-            print(current_y)
+            #print(current_x)
+            #print(current_y)
             i = 0
             j = 0
             while (i < range_size):

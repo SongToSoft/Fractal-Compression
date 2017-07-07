@@ -44,3 +44,8 @@ class Block:
     # Функция для задания сдвига по яркости
     def SetShift(self, shift):
         self.DecompressionShift = shift
+
+    # Функция для задания начальных координат блока вне конструктора
+    def SerCoordinate(self, coor_x, coor_y):
+        self.coor_x = coor_x
+        self.coor_y = coor_y
