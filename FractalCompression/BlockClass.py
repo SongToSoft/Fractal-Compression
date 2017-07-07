@@ -5,9 +5,10 @@ class Block:
 
     # Инициализация
     def __init__(self, image, size, i, j, rotate):
+        #print(str(size) + ' ' + str(i) + ' ' + str(j) + ' ' + str(rotate))
         # Начальные координаты
-        self.coor_x = j * size
-        self.coor_y = i * size
+        self.coor_x = j
+        self.coor_y = i
         # Коэффицент преобразования
         self.coeff = rotate
         self.DecompressionShift = 0
@@ -46,6 +47,6 @@ class Block:
         self.DecompressionShift = shift
 
     # Функция для задания начальных координат блока вне конструктора
-    def SerCoordinate(self, coor_x, coor_y):
+    def SetCoordinate(self, coor_x, coor_y):
         self.coor_x = coor_x
         self.coor_y = coor_y

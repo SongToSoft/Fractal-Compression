@@ -71,12 +71,6 @@ class Coder:
                     best_coeff = current_coeff
                     best_shift = current_shift
             outFile.write(str(best_coor_x) + ' ' + str(best_coor_y) + ' ' + str(best_coeff) + ' ' + str(best_shift) + '\n')
-            # print("!!!!!!!")
-            # print(best_coor_x)
-            # print(best_coor_y)
-            # print(best_coeff)
-            # print(best_shift)
-            # print("!!!!!!!")
 
         outFile.close()
 
@@ -84,28 +78,26 @@ class Coder:
         decFile = open("Compressed file.txt", "r")
         # Считываем все коэффиценты из файла
         String = decFile.read().replace("\n", " ").split(" ")
-        #print(String)
+
         count = 0
         width = (int)(String[count])
         count = count + 1
         height = (int)(String[count])
         count = count + 1
-        #print(width)
-        #print(height)
 
         range_size = (int)(String[count])
         count = count + 1
-        #print(range_size)
-        # Создаём изображение
 
+        # Создаём изображение
         #newimage = Image.new("RGB", (width, height), (255, 255, 255))
         newimage = Image.open("Expanded file.png")
         range_num_width = width // range_size
         range_num_height = height // range_size
 
+
         domain_size = range_size * 2
-        domain_num_width = width // domain_size
-        domain_num_height = height // domain_size
+        #domain_num_width = width // domain_size
+        #domain_num_height = height // domain_size
 
         # Разбиваем созданное изображение на ранговые блоки
         RangeBlockList = []
@@ -130,12 +122,12 @@ class Coder:
                 current_shift = (float)(String[count])
                 count = count + 1
                 #print(str(current_x) + ' ' + str(current_y) + ' ' + str(current_rotate) + ' ' + str(current_shift))
-                # Не работают доменныые блоки!!!!! Неправильно захватывают изображение
-                DomainBlock = BlockClass.Block(newimage, domain_size, current_x, current_y, current_rotate)
+                DomainBlock = BlockClass.Block(newimage, domain_size, current_y, current_x, current_rotate)
                 DomainBlock.SetShift(current_shift)
                 #DomainBlock.Show()
                 DomainBlockList.append(DomainBlock)
         DomainBlockList.reverse()
+
 
         # Декомпрессия
         RangeBlockListCopy = RangeBlockList.copy()
@@ -150,34 +142,30 @@ class Coder:
             draw = ImageDraw.Draw(Bufferimage)  # Создаем инструмент для рисования.
             for i in range(range_size):
                 for j in range(range_size):
-                    R = (int)(0.75 * DomainPixels[i * 2, j * 2][0]) + (int)(DomainBlock.DecompressionShift)
-                    G = (int)(0.75 * DomainPixels[i * 2, j * 2][1]) + (int)(DomainBlock.DecompressionShift)
-                    B = (int)(0.75 * DomainPixels[i * 2, j * 2][2]) + (int)(DomainBlock.DecompressionShift)
+                    R = (int)(0.75 * DomainPixels[i * 2, j * 2][0] + DomainBlock.DecompressionShift)
+                    G = (int)(0.75 * DomainPixels[i * 2, j * 2][1] + DomainBlock.DecompressionShift)
+                    B = (int)(0.75 * DomainPixels[i * 2, j * 2][2] + DomainBlock.DecompressionShift)
                     draw.point((i, j), (R, G, B))
             FinalRangeBlock = BlockClass.Block(Bufferimage, range_size, 0, 0, 0)
-            FinalRangeBlock.SerCoordinate(RangeBlock.coor_x, RangeBlock.coor_y)
+            #FinalRangeBlock.Show()
+            FinalRangeBlock.SetCoordinate(RangeBlock.coor_x, RangeBlock.coor_y)
             FinalRangeBlockList.append(FinalRangeBlock)
         FinalRangeBlockList.reverse()
 
         Newdraw = ImageDraw.Draw(newimage)  # Создаем инструмент для рисования.
-        while(FinalRangeBlockList):
-            FinalRangeBlock = FinalRangeBlockList.pop()
-            #FinalRangeBlock.Show()
+        FinalRangeBlockListCopy = FinalRangeBlockList.copy()
+        while(FinalRangeBlockListCopy):
+            FinalRangeBlock = FinalRangeBlockListCopy.pop()
+            # FinalRangeBlock.Show()
             FinalRangePixels = FinalRangeBlock.Blockimage.load()
-            current_x = FinalRangeBlock.coor_x
-            current_y = FinalRangeBlock.coor_y
-            #print(current_x)
-            #print(current_y)
-            i = 0
-            j = 0
-            while (i < range_size):
-                while (j < range_size):
+            for i in range(range_size):
+                for j in range(range_size):
                     R = FinalRangePixels[i, j][0]
                     G = FinalRangePixels[i, j][1]
                     B = FinalRangePixels[i, j][2]
-                    Newdraw.point((i + current_y, j + current_x), (R, G, B))
-                    j = j + 1
-                i = i + 1
+                    # print(i + current_y * range_size)
+                    # print(j + current_x * range_size)
+                    Newdraw.point(((i + FinalRangeBlock.coor_y * range_size), (j + FinalRangeBlock.coor_x * range_size)),(R, G, B))
 
         newimage.save("Expanded file.png")
         decFile.close()
