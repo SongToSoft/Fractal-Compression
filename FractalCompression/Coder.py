@@ -151,6 +151,7 @@ class Coder:
                     G = (int)(0.75 * DomainPixels[i * 2, j * 2][1]) + (int)(DomainBlock.DecompressionShift)
                     B = (int)(0.75 * DomainPixels[i * 2, j * 2][2]) + (int)(DomainBlock.DecompressionShift)
                     draw.point((i, j), (R, G, B))
+            # Тут явная ошибка!!!!
             FinalRangeBlock = BlockClass.Block(Bufferimage, range_size, RangeBlock.coor_x, RangeBlock.coor_y, 0)
             FinalRangeBlockList.append(FinalRangeBlock)
         FinalRangeBlockList.reverse()
