@@ -171,7 +171,7 @@ class Coder:
                     R = FinalRangePixels[i, j][0]
                     G = FinalRangePixels[i, j][1]
                     B = FinalRangePixels[i, j][2]
-                    Newdraw.point((i + current_y, j + current_x), (255, 0, 0))
+                    Newdraw.point((i + current_y, j + current_x), (R, G, B))
                     j = j + 1
                 i = i + 1
 
