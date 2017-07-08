@@ -19,7 +19,7 @@ class Coder:
         # pixel = image.load()  # Выгружаем значения пикселей.
         # print(width)
         # print(height)
-        outFile = open("Compressed file.txt", "w")
+        outFile = open("Compressed file Triangle.txt", "w")
         range_size = N
         outFile.write(str(width) + ' ' + str(height) + '\n')
         outFile.write(str(range_size) + '\n')
@@ -75,7 +75,7 @@ class Coder:
         outFile.close()
 
     def Decompression(self):
-        decFile = open("Compressed file.txt", "r")
+        decFile = open("Compressed file Triangle.txt", "r")
         # Считываем все коэффиценты из файла
         String = decFile.read().replace("\n", " ").split(" ")
 
@@ -89,8 +89,8 @@ class Coder:
         count = count + 1
 
         # Создаём изображение
-        #newimage = Image.new("RGB", (width, height), (255, 255, 255))
-        newimage = Image.open("Expanded file.png")
+        newimage = Image.new("RGB", (width, height), (255, 255, 255))
+        #newimage = Image.open("Expanded file.png")
         range_num_width = width // range_size
         range_num_height = height // range_size
 
@@ -128,7 +128,6 @@ class Coder:
                 DomainBlockList.append(DomainBlock)
         DomainBlockList.reverse()
 
-
         # Декомпрессия
         RangeBlockListCopy = RangeBlockList.copy()
         DomainBlockListCopy = DomainBlockList.copy()
@@ -136,16 +135,18 @@ class Coder:
         while(RangeBlockListCopy):
             RangeBlock = RangeBlockListCopy.pop()
             DomainBlock = DomainBlockListCopy.pop()
+            #DomainBlock.Show()
             # RangePixels = RangeBlock.Blockimage.load()  # Выгружаем значения пикселей.
             DomainPixels = DomainBlock.Blockimage.load()
-            Bufferimage = Image.new("RGB", (range_size, range_size), (0, 0, 0))
+            Bufferimage = Image.new("RGB", (range_size, range_size), (255, 255, 255))
             draw = ImageDraw.Draw(Bufferimage)  # Создаем инструмент для рисования.
             for i in range(range_size):
                 for j in range(range_size):
-                    R = (int)(0.75 * DomainPixels[i * 2, j * 2][0] + DomainBlock.DecompressionShift)
-                    G = (int)(0.75 * DomainPixels[i * 2, j * 2][1] + DomainBlock.DecompressionShift)
-                    B = (int)(0.75 * DomainPixels[i * 2, j * 2][2] + DomainBlock.DecompressionShift)
+                    R = (int)(0.75 * (DomainPixels[i * 2, j * 2][0]) + DomainBlock.DecompressionShift)
+                    G = (int)(0.75 * (DomainPixels[i * 2, j * 2][1]) + DomainBlock.DecompressionShift)
+                    B = (int)(0.75 * (DomainPixels[i * 2, j * 2][2]) + DomainBlock.DecompressionShift)
                     draw.point((i, j), (R, G, B))
+                    #Создаём новые изображения для каждого рангового блока
             FinalRangeBlock = BlockClass.Block(Bufferimage, range_size, 0, 0, 0)
             #FinalRangeBlock.Show()
             FinalRangeBlock.SetCoordinate(RangeBlock.coor_x, RangeBlock.coor_y)
@@ -156,18 +157,17 @@ class Coder:
         FinalRangeBlockListCopy = FinalRangeBlockList.copy()
         while(FinalRangeBlockListCopy):
             FinalRangeBlock = FinalRangeBlockListCopy.pop()
-            # FinalRangeBlock.Show()
+            #FinalRangeBlock.Show()
             FinalRangePixels = FinalRangeBlock.Blockimage.load()
             for i in range(range_size):
                 for j in range(range_size):
                     R = FinalRangePixels[i, j][0]
                     G = FinalRangePixels[i, j][1]
                     B = FinalRangePixels[i, j][2]
-                    # print(i + current_y * range_size)
-                    # print(j + current_x * range_size)
-                    Newdraw.point(((i + FinalRangeBlock.coor_y * range_size), (j + FinalRangeBlock.coor_x * range_size)),(R, G, B))
+                    Newdraw.point(((i + FinalRangeBlock.coor_x * range_size), (j + FinalRangeBlock.coor_y * range_size)),(R, G, B))
 
         newimage.save("Expanded file.png")
+        newimage.close()
         decFile.close()
 
 
