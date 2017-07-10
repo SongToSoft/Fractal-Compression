@@ -19,7 +19,7 @@ class Coder:
         # pixel = image.load()  # Выгружаем значения пикселей.
         # print(width)
         # print(height)
-        outFile = open("Compressed file Triangle.txt", "w")
+        outFile = open("Compressed file.txt", "w")
         range_size = N
         outFile.write(str(width) + ' ' + str(height) + '\n')
         outFile.write(str(range_size) + '\n')
@@ -50,6 +50,8 @@ class Coder:
                     DomainBlockList.append(DomainBlock)
         DomainBlockList.reverse()
 
+        print(">>?<<")
+        tt = 0
         # Компрессия
         RangeBlockListCopy = RangeBlockList.copy()
         while(RangeBlockListCopy):
@@ -64,18 +66,31 @@ class Coder:
                 current_coeff = DomainBlock.coeff
                 current_shift = L2.L2().Shift(RangeBlock, DomainBlock)
                 current_distance = L2.L2().Distance(RangeBlock, DomainBlock, current_shift)
+                #current_shift = L2.L2().OOO(RangeBlock, DomainBlock)
+                #current_distance = L2.L2().RRR(RangeBlock, DomainBlock, current_shift)
+                print(current_coor_x)
+                print(current_coor_y)
+                print(current_coeff)
+                print(current_shift)
                 if (current_distance < min_distance):
                     min_distance = current_distance
                     best_coor_x = current_coor_x
                     best_coor_y = current_coor_y
                     best_coeff = current_coeff
                     best_shift = current_shift
+                    print(best_coor_x)
+                    print(best_coor_y)
+                    print(best_coeff)
+                    print(best_shift)
+            print("!!!!!")
+            print(tt)
+            tt = tt + 1
             outFile.write(str(best_coor_x) + ' ' + str(best_coor_y) + ' ' + str(best_coeff) + ' ' + str(best_shift) + '\n')
 
         outFile.close()
 
     def Decompression(self):
-        decFile = open("Compressed file Triangle.txt", "r")
+        decFile = open("Compressed file.txt", "r")
         # Считываем все коэффиценты из файла
         String = decFile.read().replace("\n", " ").split(" ")
 
@@ -89,8 +104,8 @@ class Coder:
         count = count + 1
 
         # Создаём изображение
-        newimage = Image.new("RGB", (width, height), (255, 255, 255))
-        #newimage = Image.open("Expanded file.png")
+        #newimage = Image.new("RGB", (width, height), (255, 255, 255))
+        newimage = Image.open("Expanded file.png")
         range_num_width = width // range_size
         range_num_height = height // range_size
 
@@ -123,7 +138,7 @@ class Coder:
                 count = count + 1
                 #print(str(current_x) + ' ' + str(current_y) + ' ' + str(current_rotate) + ' ' + str(current_shift))
                 DomainBlock = BlockClass.Block(newimage, domain_size, current_y, current_x, current_rotate)
-                DomainBlock.SetShift(current_shift)
+                DomainBlock.SetShift((-current_shift))
                 #DomainBlock.Show()
                 DomainBlockList.append(DomainBlock)
         DomainBlockList.reverse()
@@ -142,9 +157,9 @@ class Coder:
             draw = ImageDraw.Draw(Bufferimage)  # Создаем инструмент для рисования.
             for i in range(range_size):
                 for j in range(range_size):
-                    R = (int)(0.75 * (DomainPixels[i * 2, j * 2][0]) + DomainBlock.DecompressionShift)
-                    G = (int)(0.75 * (DomainPixels[i * 2, j * 2][1]) + DomainBlock.DecompressionShift)
-                    B = (int)(0.75 * (DomainPixels[i * 2, j * 2][2]) + DomainBlock.DecompressionShift)
+                    R = (int)(0.75 * ((DomainPixels[i * 2, j * 2][0]) + (DomainBlock.DecompressionShift)))
+                    G = (int)(0.75 * ((DomainPixels[i * 2, j * 2][1]) + (DomainBlock.DecompressionShift)))
+                    B = (int)(0.75 * ((DomainPixels[i * 2, j * 2][2]) + (DomainBlock.DecompressionShift)))
                     draw.point((i, j), (R, G, B))
                     #Создаём новые изображения для каждого рангового блока
             FinalRangeBlock = BlockClass.Block(Bufferimage, range_size, 0, 0, 0)

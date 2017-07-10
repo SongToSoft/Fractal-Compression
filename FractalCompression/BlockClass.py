@@ -12,6 +12,7 @@ class Block:
         # Коэффицент преобразования
         self.coeff = rotate
         self.DecompressionShift = 0
+        self.SumBlockValue = 0
         area = (j * size, i * size, (j + 1) * size, (i + 1) * size)
 
         self.Blockimage = image.crop(area)
