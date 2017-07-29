@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // Общие сведения об этой сборке предоставляются следующим набором
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
-[assembly: AssemblyTitle("Fractal Compression")]
+[assembly: AssemblyTitle("NewFractalCompression")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Fractal Compression")]
+[assembly: AssemblyProduct("NewFractalCompression")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
-[assembly: Guid("d6f48cbc-2e65-44aa-a9ae-1248f592a000")]
+[assembly: Guid("fdd18cbd-58e9-41ab-88d9-0e70f4c7afc3")]
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //

@@ -1,6 +1,0 @@
-C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\Fractal Compression\Fractal Compression\bin\Debug\Fractal Compression.exe.config
-C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\Fractal Compression\Fractal Compression\bin\Debug\Fractal Compression.exe
-C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\Fractal Compression\Fractal Compression\bin\Debug\Fractal Compression.pdb
-C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\Fractal Compression\Fractal Compression\obj\Debug\Fractal Compression.csprojResolveAssemblyReference.cache
-C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\Fractal Compression\Fractal Compression\obj\Debug\Fractal Compression.exe
-C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\Fractal Compression\Fractal Compression\obj\Debug\Fractal Compression.pdb
