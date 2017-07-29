@@ -48,6 +48,7 @@ namespace NewFractalCompression
             }
             return NewImageBrightness;
         }
+    
         static Color[,] RotateColor(Color[,] ImageColor, int Image_width, int count)
         {
             Color[,] NewImageColor = ImageColor;
@@ -95,6 +96,32 @@ namespace NewFractalCompression
             }
             return distance;
         }
+        //static double Distance(Color[,] RangeColor, Color[,] DomainColor, Block RangeBlock, Block DomainBlock, int range_block_size, double shift)
+        //{
+        //    double distance = 0;
+        //    double RangeValue = 0;
+        //    double DomainValue = 0;
+        //    for (int i = 0; i < range_block_size; ++i)
+        //    {
+        //        for (int j = 0; j < range_block_size; ++j)
+        //        {
+        //            Color color = RangeColor[RangeBlock.X + i, RangeBlock.Y + j];
+        //            int A = color.A;
+        //            int B = color.B;
+        //            int G = color.G;
+        //            RangeValue = A + B + G;
+
+        //            color = DomainColor[DomainBlock.X + i, DomainBlock.Y + j];
+        //            A = color.A;
+        //            B = color.B;
+        //            G = color.G;
+        //            DomainValue = A + B + G;
+
+        //            distance += Math.Pow((RangeValue - 0.75 * DomainValue + shift), 2);
+        //        }
+        //    }
+        //    return distance;
+        //}
         static void Compression(string filename)
         {
             Bitmap Image = new Bitmap(filename);
@@ -206,36 +233,38 @@ namespace NewFractalCompression
                         Block RangeBlock = RangeArray[i, j];
                         Coefficients Current_coefficent = CompressCoeff[i, j];
                         RotateNewImageColor = RotateColor(RotateNewImageColor, Image.Width, Current_coefficent.rotate);
-                        for (int pix = 0; pix < range_block_size; ++pix)
+                        for (int pix_x = 0; pix_x < range_block_size; ++pix_x)
                         {
-                            Color color = RotateNewImage.GetPixel(Current_coefficent.X + pix, Current_coefficent.Y + pix);
+                            for (int pix_y = 0; pix_y < range_block_size; ++pix_y)
+                            {
+                                Color color = RotateNewImage.GetPixel(Current_coefficent.X + pix_x * 2, Current_coefficent.Y + pix_y * 2);
 
-                            int A = (int)(0.75 * color.A + Current_coefficent.shift);
-                            if (A < 0)
-                                A = 0;
-                            if (A > 255)
-                                A = 255;
+                                int A = (int)(0.75 * color.A + Current_coefficent.shift);
+                                if (A < 0)
+                                    A = 0;
+                                if (A > 255)
+                                    A = 255;
 
-                            int B = (int)(0.75 * color.B + Current_coefficent.shift);
-                            if (B < 0)
-                                B = 0;
-                            if (B > 255)
-                                B = 255;
+                                int B = (int)(0.75 * color.B + Current_coefficent.shift);
+                                if (B < 0)
+                                    B = 0;
+                                if (B > 255)
+                                    B = 255;
 
-                            int G = (int)(0.75 * color.G + Current_coefficent.shift);
-                            if (G < 0)
-                                G = 0;
-                            if (G > 255)
-                                G = 255;
+                                int G = (int)(0.75 * color.G + Current_coefficent.shift);
+                                if (G < 0)
+                                    G = 0;
+                                if (G > 255)
+                                    G = 255;
 
-                            color = Color.FromArgb(A,B,G);
-                            NewImage.SetPixel(RangeBlock.X + pix, RangeBlock.Y + pix, color);
+                                color = Color.FromArgb(A, B, G);
+                                NewImage.SetPixel(RangeBlock.X + pix_x, RangeBlock.Y + pix_y, color);
+                            }
                         }
                     }
                 }
             }
             NewImage.Save(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\Expanded file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
-
         }
         static void Main(string[] args)
         {
