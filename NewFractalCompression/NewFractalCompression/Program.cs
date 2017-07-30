@@ -42,13 +42,14 @@ namespace NewFractalCompression
                 {
                     for (int j = 0; j < Image_width; ++j)
                     {
-                        NewImageBrightness[i, j] = ImageBrightness[j, Image_width - i - 1];
+                        //NewImageBrightness[i, j] = ImageBrightness[j, Image_width - i - 1];
+                        NewImageBrightness[j, Image_width - 1 - i] = ImageBrightness[i, j];
+
                     }
                 }
             }
             return NewImageBrightness;
         }
-    
         static Color[,] RotateColor(Color[,] ImageColor, int Image_width, int count)
         {
             Color[,] NewImageColor = ImageColor;
@@ -58,7 +59,8 @@ namespace NewFractalCompression
                 {
                     for (int j = 0; j < Image_width; ++j)
                     {
-                        NewImageColor[i, j] = ImageColor[j, Image_width - i - 1];
+                        //NewImageColor[i, j] = ImageColor[j, Image_width - i - 1];
+                        NewImageColor[j, Image_width - 1 - i] = ImageColor[i, j];
                     }
                 }
             }
@@ -77,9 +79,27 @@ namespace NewFractalCompression
                     DomainValue += ImageBrightness[DomainBlock.X + i * 2, DomainBlock.Y + j * 2];
                 }
             }
-            shift = (RangeValue / range_block_size) - 0.75 * (DomainValue / range_block_size);
+            shift =  ((RangeValue)- (0.75 * DomainValue)) / (range_block_size * range_block_size);
             return shift;
         }
+        //static double Shift(Bitmap Image, Block RangeBlock, Block DomainBlock, int range_block_size)
+        //{
+        //    double shift = 0;
+        //    double RangeValue = 0;
+        //    double DomainValue = 0;
+        //    for (int i = 0; i < range_block_size; ++i)
+        //    {
+        //        for (int j = 0; j < range_block_size; ++j)
+        //        {
+        //            Color color = Image.GetPixel(RangeBlock.X + i, RangeBlock.Y + j);
+        //            RangeValue += ((color.R + color.G + color.B) / (3));
+        //            color = Image.GetPixel(DomainBlock.X + i * 2, DomainBlock.Y + j * 2);
+        //            DomainValue += ((color.R + color.G + color.B) / (3));
+        //        }
+        //    }
+        //    shift = (RangeValue % 255) - 0.75 * (DomainValue % 255);
+        //    return shift;
+        //}
         static double Distance(double[,] RangeImageBrightness, double[,] DomainImageBrightness, Block RangeBlock, Block DomainBlock, int range_block_size, double shift)
         {
             double distance = 0;
@@ -90,13 +110,13 @@ namespace NewFractalCompression
                 for (int j = 0; j < range_block_size; ++j)
                 {
                     RangeValue = RangeImageBrightness[RangeBlock.X + i, RangeBlock.Y + j];
-                    DomainValue = DomainImageBrightness[DomainBlock.X + i * 2, DomainBlock.Y + j * 2];
-                    distance += Math.Pow((RangeValue - 0.75 * DomainValue + shift), 2);
+                    DomainValue = DomainImageBrightness[DomainBlock.X + (i * 2), DomainBlock.Y + (j * 2)];
+                    distance += Math.Pow((RangeValue + shift - 0.75 * DomainValue), 2);
                 }
             }
             return distance;
         }
-        //static double Distance(Color[,] RangeColor, Color[,] DomainColor, Block RangeBlock, Block DomainBlock, int range_block_size, double shift)
+        //static double Distance(Bitmap RangeImage, Bitmap DomainImage, Block RangeBlock, Block DomainBlock, int range_block_size, double shift)
         //{
         //    double distance = 0;
         //    double RangeValue = 0;
@@ -105,17 +125,17 @@ namespace NewFractalCompression
         //    {
         //        for (int j = 0; j < range_block_size; ++j)
         //        {
-        //            Color color = RangeColor[RangeBlock.X + i, RangeBlock.Y + j];
-        //            int A = color.A;
-        //            int B = color.B;
+        //            Color color = RangeImage.GetPixel(RangeBlock.X + i, RangeBlock.Y + j);
+        //            int R = color.R;
         //            int G = color.G;
-        //            RangeValue = A + B + G;
+        //            int B = color.B;
+        //            RangeValue = R + G + B;
 
-        //            color = DomainColor[DomainBlock.X + i, DomainBlock.Y + j];
-        //            A = color.A;
-        //            B = color.B;
+        //            color = DomainImage.GetPixel(DomainBlock.X + i, DomainBlock.Y + j);
+        //            R = color.R;
         //            G = color.G;
-        //            DomainValue = A + B + G;
+        //            B = color.B;
+        //            DomainValue = R + G + B;
 
         //            distance += Math.Pow((RangeValue - 0.75 * DomainValue + shift), 2);
         //        }
@@ -148,13 +168,23 @@ namespace NewFractalCompression
             //Создаем доменные блоки
             int domain_num = range_num / 2;
             int domain_block_size = range_block_size * 2;
+            //Block[,] DomainArray = new Block[domain_num, domain_num];
+            //for (int i = 0; i < domain_num; ++i)
+            //{
+            //    for (int j = 0; j < domain_num; ++j)
+            //    {
+            //        DomainArray[i, j].X = i * domain_block_size;
+            //        DomainArray[i, j].Y = j * domain_block_size;
+            //    }
+            //}
+            domain_num = range_num - 1;
             Block[,] DomainArray = new Block[domain_num, domain_num];
             for (int i = 0; i < domain_num; ++i)
             {
                 for (int j = 0; j < domain_num; ++j)
                 {
-                    DomainArray[i, j].X = i * domain_block_size;
-                    DomainArray[i, j].Y = j * domain_block_size;
+                    DomainArray[i, j].X = i * range_block_size;
+                    DomainArray[i, j].Y = j * range_block_size;
                 }
             }
             //Алгоритм сжатия
@@ -181,12 +211,22 @@ namespace NewFractalCompression
                         for (int l = 0; l < domain_num; ++l)
                         {
                             Block DomainBlock = DomainArray[k, l];
+                            Bitmap DomainImage = Image;
                             double[,] DomainImageBrightness = ImageBrightness;
                             for (int rotate = 0; rotate < 4; ++rotate)
                             {
                                 DomainImageBrightness = Rotate(ImageBrightness, Image.Width, rotate);
+                                //if (rotate == 1)
+                                //    DomainImage.RotateFlip(RotateFlipType.Rotate90FlipNone);
+                                //if (rotate == 2)
+                                //    DomainImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
+                                //if (rotate == 3)
+                                //    DomainImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
                                 double shift = Shift(ImageBrightness, RangeBlock, DomainBlock, range_block_size);
-                                double distance = Distance(ImageBrightness, DomainImageBrightness, RangeBlock, DomainBlock, range_block_size, range_block_size);
+                                //double shift = Shift(Image, RangeBlock, DomainBlock, range_block_size);
+                                double distance = Distance(ImageBrightness, DomainImageBrightness, RangeBlock, DomainBlock, range_block_size, shift);
+                            
+                                //double distance = Distance(Image, DomainImage, RangeBlock, DomainBlock, range_block_size, shift);
                                 if (distance < current_distance)
                                 {
                                     current_x = DomainBlock.X;
@@ -215,7 +255,14 @@ namespace NewFractalCompression
             //Алгоритм декомпрессии
 
             Bitmap NewImage = new Bitmap(Image.Width, Image.Height);
-            for (int it = 0; it < 16; ++it)
+            for (int i = 0; i < NewImage.Width; ++i)
+            {
+                for (int j = 0; j < NewImage.Height; ++j)
+                {
+                    NewImage.SetPixel(i, j, Color.White);
+                }
+            }
+            for (int it = 0; it < 30; ++it)
             {
                 Bitmap RotateNewImage = NewImage;
                 Color[,] RotateNewImageColor = new Color[Image.Width, Image.Height];
@@ -239,25 +286,28 @@ namespace NewFractalCompression
                             {
                                 Color color = RotateNewImage.GetPixel(Current_coefficent.X + pix_x * 2, Current_coefficent.Y + pix_y * 2);
 
-                                int A = (int)(0.75 * color.A + Current_coefficent.shift);
-                                if (A < 0)
-                                    A = 0;
-                                if (A > 255)
-                                    A = 255;
-
-                                int B = (int)(0.75 * color.B + Current_coefficent.shift);
-                                if (B < 0)
-                                    B = 0;
-                                if (B > 255)
-                                    B = 255;
-
-                                int G = (int)(0.75 * color.G + Current_coefficent.shift);
+                                int R = (int)(0.75 * color.R + (Current_coefficent.shift));
+                                if (R < 0)
+                                    R = 0;
+                                if (R > 255)
+                                    R = 255;
+                                //System.Console.Write(R);
+                                int G = (int)(0.75 * color.G + (Current_coefficent.shift));
                                 if (G < 0)
                                     G = 0;
                                 if (G > 255)
                                     G = 255;
-
-                                color = Color.FromArgb(A, B, G);
+                                //System.Console.Write(" ");
+                                //System.Console.Write(G);
+                                int B = (int)(0.75 * color.B + (Current_coefficent.shift));
+                                if (B < 0)
+                                    B = 0;
+                                if (B > 255)
+                                    B = 255;
+                                //System.Console.Write(" ");
+                                //System.Console.Write(B);
+                                //System.Console.WriteLine();
+                                color = Color.FromArgb(R, G, B);
                                 NewImage.SetPixel(RangeBlock.X + pix_x, RangeBlock.Y + pix_y, color);
                             }
                         }
