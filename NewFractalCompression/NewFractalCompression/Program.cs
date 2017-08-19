@@ -257,7 +257,7 @@ namespace NewFractalCompression
                 }
             }
             //Основной параметр, отвечающий за размеры ранговых блоков
-            int range_block_size = 2;
+            int range_block_size = 8;
             //Создаём ранговые блоки
             int range_num_width = Image.Width / range_block_size;
             int range_num_height = Image.Height / range_block_size;
@@ -283,6 +283,8 @@ namespace NewFractalCompression
             }
             //Алгоритм сжатия
             int count = 1;
+            //Общеее число преобразований
+            int block_all_num = range_num_width * range_num_height * 3;
             Coefficients[,] CompressCoeff = new Coefficients[range_num_width, range_num_height];
             StreamWriter sw = new StreamWriter(@"C: \Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\Compression.txt");
             sw.Write(Image.Width);
@@ -310,8 +312,8 @@ namespace NewFractalCompression
                                 //Bitmap DomainImage = Image;
                                 Color[,] DomainImageColor = ImageColor;
                                 //System.Console.WriteLine(Angle(RangeBlock, DomainBlock));
-                                //Выполняем выбор доменного блока, если угол его центр масс с ранговым блоком меньше 30
-                                if (Angle(RangeBlock, DomainBlock) <= 10)
+                                //Выполняем выбор доменного блока, если угол его центр масс с ранговым блоком меньше определенного угла
+                                if (Angle(RangeBlock, DomainBlock) <= 10) 
                                 {
                                     for (int rotate = 0; rotate < 4; ++rotate)
                                     {
@@ -341,9 +343,12 @@ namespace NewFractalCompression
                                 }
                             }
                         }
-                        System.Console.Write(count);
-                        System.Console.Write('/');
-                        System.Console.Write((range_num_width * range_num_height));
+                        //System.Console.Write(count);
+                        //System.Console.Write('/');
+                        //System.Console.Write((range_num_width * range_num_height));
+                        double proc = ((100 * count) / block_all_num);
+                        System.Console.Write(proc);
+                        System.Console.Write(" %");
                         System.Console.WriteLine();
                         ++count;
                         CompressCoeff[i, j].X = current_x;
@@ -354,7 +359,7 @@ namespace NewFractalCompression
                         sw.WriteLine(CompressCoeff[i, j].X + " " + CompressCoeff[i, j].Y + " " + CompressCoeff[i, j].rotate + " " + CompressCoeff[i, j].shift);
                     }
                 }
-                count = 1;
+                //count = 1;
             }
             sw.Close();
         }
@@ -473,17 +478,17 @@ namespace NewFractalCompression
                         Block DomainBlockG = DomainArray[Current_coefficentG.X, Current_coefficentG.Y];
                         Block DomainBlockB = DomainArray[Current_coefficentB.X, Current_coefficentB.Y];
                         
-                        for (int rotate = 0; rotate < Current_coefficentR.rotate; ++rotate)
+                        for (int rotate = 0; rotate < Current_coefficentR.rotate + 1; ++rotate)
                         {
                             RotateNewImageR = RotateColor(RotateNewImageR, domain_block_size, DomainBlockR);
                         }
 
-                        for (int rotate = 0; rotate < Current_coefficentG.rotate; ++rotate)
+                        for (int rotate = 0; rotate < Current_coefficentG.rotate + 1; ++rotate)
                         {
                             RotateNewImageG = RotateColor(RotateNewImageG, domain_block_size, DomainBlockG);
                         }
 
-                        for (int rotate = 0; rotate < Current_coefficentB.rotate; ++rotate)
+                        for (int rotate = 0; rotate < Current_coefficentB.rotate + 1; ++rotate)
                         {
                             RotateNewImageB = RotateColor(RotateNewImageB, domain_block_size, DomainBlockB);
                         }
@@ -525,14 +530,14 @@ namespace NewFractalCompression
                     }
                 }
             }
-            NewImage.Save(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\Expanded file1.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            NewImage.Save(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\Expanded file tmp.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
         }
         static void Main(string[] args)
         {
             System.Diagnostics.Stopwatch sw = new Stopwatch();
             sw.Start();
             System.Console.WriteLine("");
-            Compression(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\neon2.jpg");
+            Compression(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\lena.jpg");
             Decompression();
             sw.Stop();
             System.Console.WriteLine((sw.ElapsedMilliseconds / 100.0).ToString());
