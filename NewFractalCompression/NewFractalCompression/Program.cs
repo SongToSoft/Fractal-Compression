@@ -257,7 +257,7 @@ namespace NewFractalCompression
                 }
             }
             //Основной параметр, отвечающий за размеры ранговых блоков
-            int range_block_size = 8;
+            int range_block_size = 5;
             //Создаём ранговые блоки
             int range_num_width = Image.Width / range_block_size;
             int range_num_height = Image.Height / range_block_size;
@@ -284,7 +284,8 @@ namespace NewFractalCompression
             //Алгоритм сжатия
             int count = 1;
             //Общеее число преобразований
-            int block_all_num = range_num_width * range_num_height * 3;
+            //int block_all_num = range_num_width * range_num_height * 3;
+            int block_all_num = range_num_width * range_num_height;
             Coefficients[,] CompressCoeff = new Coefficients[range_num_width, range_num_height];
             StreamWriter sw = new StreamWriter(@"C: \Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\Compression.txt");
             sw.Write(Image.Width);
@@ -292,13 +293,13 @@ namespace NewFractalCompression
             sw.Write(Image.Height);
             sw.WriteLine();
             sw.WriteLine(range_block_size);
-            for (int flag = 1; flag < 4; ++flag)
+            for (int flag = 1; flag < 2; ++flag)
             {
                 for (int i = 0; i < range_num_width; ++i)
                 {
                     for (int j = 0; j < range_num_height; ++j)
                     {
-                        Block RangeBlock = RangeArray[i, j];
+                        //Block RangeBlock = RangeArray[i, j];
                         int current_x = 0;
                         int current_y = 0;
                         double current_distance = Double.MaxValue;
@@ -308,12 +309,13 @@ namespace NewFractalCompression
                         {
                             for (int l = 0; l < domain_num_height; ++l)
                             {
-                                Block DomainBlock = DomainArray[k, l];
+                                //Block DomainBlock = DomainArray[k, l];
                                 //Bitmap DomainImage = Image;
                                 Color[,] DomainImageColor = ImageColor;
                                 //System.Console.WriteLine(Angle(RangeBlock, DomainBlock));
                                 //Выполняем выбор доменного блока, если угол его центр масс с ранговым блоком меньше определенного угла
-                                if (Angle(RangeBlock, DomainBlock) <= 10) 
+                                if (Angle(RangeArray[i, j], DomainArray[k, l]) <= 10)
+                                //if (true)
                                 {
                                     for (int rotate = 0; rotate < 4; ++rotate)
                                     {
@@ -324,10 +326,10 @@ namespace NewFractalCompression
                                         //    DomainImage.RotateFlip(RotateFlipType.Rotate180FlipNone);
                                         //if (rotate == 3)
                                         //    DomainImage.RotateFlip(RotateFlipType.Rotate270FlipNone);
-                                        DomainImageColor = RotateColor(DomainImageColor, domain_block_size, DomainBlock);
-                                        double shift = Shift(RangeBlock, DomainBlock, range_block_size, flag);
+                                        DomainImageColor = RotateColor(DomainImageColor, domain_block_size, DomainArray[k, l]);
+                                        double shift = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, flag);
                                         //double shift = Shift(Image, RangeBlock, DomainBlock, range_block_size);
-                                        double distance = Distance(ImageColor, DomainImageColor, RangeBlock, DomainBlock, range_block_size, shift, flag);
+                                        double distance = Distance(ImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shift, flag);
                                         //double distance = Distance(Image, DomainImage, RangeBlock, DomainBlock, range_block_size, shift);
                                         if (distance < current_distance)
                                         {
@@ -395,35 +397,35 @@ namespace NewFractalCompression
                 }
             }
             Coefficients[,] CompressCoeffG = new Coefficients[range_num_width, range_num_height];
-            for (int i = 0; i < range_num_width; ++i)
-            {
-                for (int j = 0; j < range_num_height; ++j)
-                {
-                    //srt = sr.ReadLine();
-                    soul = srt.Split();
-                    CompressCoeffG[i, j].X = Convert.ToInt32(soul[0]);
-                    CompressCoeffG[i, j].Y = Convert.ToInt32(soul[1]);
-                    CompressCoeffG[i, j].rotate = Convert.ToInt32(soul[2]);
-                    CompressCoeffG[i, j].shift = Convert.ToDouble(soul[3]);
-                    srt = sr.ReadLine();
-                    //printCoefficients(CompressCoeff[i, j]);
-                }
-            }
+            //for (int i = 0; i < range_num_width; ++i)
+            //{
+            //    for (int j = 0; j < range_num_height; ++j)
+            //    {
+            //        //srt = sr.ReadLine();
+            //        soul = srt.Split();
+            //        CompressCoeffG[i, j].X = Convert.ToInt32(soul[0]);
+            //        CompressCoeffG[i, j].Y = Convert.ToInt32(soul[1]);
+            //        CompressCoeffG[i, j].rotate = Convert.ToInt32(soul[2]);
+            //        CompressCoeffG[i, j].shift = Convert.ToDouble(soul[3]);
+            //        srt = sr.ReadLine();
+            //        //printCoefficients(CompressCoeff[i, j]);
+            //    }
+            //}
             Coefficients[,] CompressCoeffB = new Coefficients[range_num_width, range_num_height];
-            for (int i = 0; i < range_num_width; ++i)
-            {
-                for (int j = 0; j < range_num_height; ++j)
-                {
-                    //srt = sr.ReadLine();
-                    soul = srt.Split();
-                    CompressCoeffB[i, j].X = Convert.ToInt32(soul[0]);
-                    CompressCoeffB[i, j].Y = Convert.ToInt32(soul[1]);
-                    CompressCoeffB[i, j].rotate = Convert.ToInt32(soul[2]);
-                    CompressCoeffB[i, j].shift = Convert.ToDouble(soul[3]);
-                    srt = sr.ReadLine();
-                    //printCoefficients(CompressCoeff[i, j]);
-                }
-            }
+            //for (int i = 0; i < range_num_width; ++i)
+            //{
+            //    for (int j = 0; j < range_num_height; ++j)
+            //    {
+            //        //srt = sr.ReadLine();
+            //        soul = srt.Split();
+            //        CompressCoeffB[i, j].X = Convert.ToInt32(soul[0]);
+            //        CompressCoeffB[i, j].Y = Convert.ToInt32(soul[1]);
+            //        CompressCoeffB[i, j].rotate = Convert.ToInt32(soul[2]);
+            //        CompressCoeffB[i, j].shift = Convert.ToDouble(soul[3]);
+            //        srt = sr.ReadLine();
+            //        //printCoefficients(CompressCoeff[i, j]);
+            //    }
+            //}
             sr.Close();
             //Создаём ранговые блоки
             Block[,] RangeArray = new Block[range_num_width, range_num_height];
@@ -519,7 +521,7 @@ namespace NewFractalCompression
                                 if (B > 255)
                                     B = 255;
 
-                                Color Newcolor = Color.FromArgb(R, G, B);
+                                Color Newcolor = Color.FromArgb(R, R, R);
                                 NewImage.SetPixel(RangeBlock.X + pix_x, RangeBlock.Y + pix_y, Newcolor);
                             }
                         }
@@ -530,14 +532,14 @@ namespace NewFractalCompression
                     }
                 }
             }
-            NewImage.Save(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\Expanded file tmp.jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            NewImage.Save(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\Expanded file tmp.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
         }
         static void Main(string[] args)
         {
             System.Diagnostics.Stopwatch sw = new Stopwatch();
             sw.Start();
             System.Console.WriteLine("");
-            Compression(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\lena.jpg");
+            Compression(@"C:\Users\Dima Bogdanov\Documents\Visual Studio 2017\Projects\NewFractalCompression\NewFractalCompression\test.bmp");
             Decompression();
             sw.Stop();
             System.Console.WriteLine((sw.ElapsedMilliseconds / 100.0).ToString());
