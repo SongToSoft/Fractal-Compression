@@ -1,6 +1,0 @@
-c:\users\dima bogdanov\documents\visual studio 2017\Projects\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.exe.config
-c:\users\dima bogdanov\documents\visual studio 2017\Projects\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.exe
-c:\users\dima bogdanov\documents\visual studio 2017\Projects\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.pdb
-c:\users\dima bogdanov\documents\visual studio 2017\Projects\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csprojResolveAssemblyReference.cache
-c:\users\dima bogdanov\documents\visual studio 2017\Projects\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.exe
-c:\users\dima bogdanov\documents\visual studio 2017\Projects\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.pdb
