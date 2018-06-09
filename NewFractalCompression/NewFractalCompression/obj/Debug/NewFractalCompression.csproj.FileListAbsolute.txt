@@ -43,17 +43,3 @@ C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCo
 C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.GLControl.xml
 C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.Properties.Resources.resources
 C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csproj.GenerateResource.Cache
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.exe.config
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.exe
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.pdb
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.GLControl.dll
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\Cloo.xml
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\OpenCLTemplate.xml
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.xml
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.GLControl.xml
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csprojResolveAssemblyReference.cache
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.Properties.Resources.resources
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csproj.GenerateResource.Cache
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csproj.CoreCompileInputs.cache
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.exe
-C:\Users\Dima\Documents\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.pdb
