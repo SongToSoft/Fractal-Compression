@@ -118,6 +118,15 @@ namespace NewFractalCompression.Code
             }
             return flag;
         }
-
+        static public int GetPow(int Num)
+        {
+            for (int i = 0; i < Num; ++i)
+            {
+                int Checker = (int)Math.Pow((2), i);
+                if (Checker == Num)
+                    return i;
+            }
+            return 1;
+        }
     }
 }

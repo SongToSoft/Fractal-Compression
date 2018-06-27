@@ -69,9 +69,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Code\BlockTree.cs" />
     <Compile Include="Code\CompressionClass.cs" />
     <Compile Include="Code\Metrics.cs" />
     <Compile Include="Code\MyConverter.cs" />
+    <Compile Include="Code\Object.cs" />
     <Compile Include="Code\Post.cs" />
     <Compile Include="Code\Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

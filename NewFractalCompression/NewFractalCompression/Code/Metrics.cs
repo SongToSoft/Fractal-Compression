@@ -23,7 +23,7 @@ namespace NewFractalCompression.Code
         }
         //Определение метрики между двумя блоками
         //Один из вариантов метрики, предложенный Шарабайко, который по его версии должен ускорить подсчёт 
-        static public double DistanceShar(Color[,] RangeImageColor, Color[,] DomainImageColor, Block RangeBlock, Block DomainBlock, int range_block_size, double shift, int flag)
+        static public double DistanceShar(Color[,] RangeImageColor, Color[,] DomainImageColor, Object.Block RangeBlock, Object.Block DomainBlock, int range_block_size, double shift, int flag)
         {
             double distance = 0;
             double RangeValue = 0;
@@ -74,7 +74,7 @@ namespace NewFractalCompression.Code
             return distance;
         }
         //Классический вариант метрики
-        static public double DistanceClass(Color[,] RangeImageColor, Color[,] DomainImageColor, Block RangeBlock, Block DomainBlock, int range_block_size, double shift, int flag)
+        static public double DistanceClass(Color[,] RangeImageColor, Color[,] DomainImageColor, Object.Block RangeBlock, Object.Block DomainBlock, int range_block_size, double shift, int flag)
         {
             double distance = 0;
             double RangeValue = 0;
@@ -120,7 +120,7 @@ namespace NewFractalCompression.Code
             }
             return distance;
         }
-        static public double PSNR(Color[,] RangeImageColor, Color[,] DomainImageColor, Block RangeBlock, Block DomainBlock, int range_block_size, double shift, int flag)
+        static public double PSNR(Color[,] RangeImageColor, Color[,] DomainImageColor, Object.Block RangeBlock, Object.Block DomainBlock, int range_block_size, double shift, int flag)
         {
             double distance = 0;
             double RangeValue = 0;
@@ -136,6 +136,22 @@ namespace NewFractalCompression.Code
             }
             distance = Math.Sqrt(distance) / (range_block_size * range_block_size);
             distance = -20 * Math.Log(distance);
+            return distance;
+        }
+        static public double DistanceQuad(Color[,] ClassImageColor, Object.Block RangeBlock, Object.Block DomainBlock, int range_block_size, double shift)
+        {
+            double distance = 0;
+            double RangeValue = 0;
+            double DomainValue = 0;
+            for (int i = 0; i < range_block_size; ++i)
+            {
+                for (int j = 0; j < range_block_size; ++j)
+                {
+                    RangeValue = ClassImageColor[RangeBlock.X + i, RangeBlock.Y + j].R;
+                    DomainValue = ClassImageColor[DomainBlock.X + (i * 2), DomainBlock.Y + (j * 2)].R;
+                    distance += Metrics.Two(RangeValue, DomainValue, shift);
+                }
+            }
             return distance;
         }
     }

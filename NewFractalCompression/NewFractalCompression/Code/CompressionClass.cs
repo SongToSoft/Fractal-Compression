@@ -16,40 +16,19 @@ namespace NewFractalCompression.Code
         public static int domain_num_width, domain_num_height;
         public static int range_block_size, domain_block_size, colorflag;
         public static int count, block_all_num;
-        public static Block[,] RangeArray;
-        public static Block[,] DomainArray;
-        public static Color[,] ImageColor;
-        public static Coefficients[,,] CompressCoeff;
-        public struct Coefficients
-        {
-            public int X;
-            public int Y;
-            //public int position;
-            public int rotate;
-            //public double shift;
-            public int shift;
-            //Один из вариантов
-            public int shiftR;
-            public int shiftG;
-            public int shiftB;
-        }
-        public struct Block
-        {
-            public int X;
-            public int Y;
-            //public int position;
-            public int SumR;
-            public int SumG;
-            public int SumB;
-            //Эти коэффициенты использовались в одной из метрик
-            public int SumR2;
-            public int SumG2;
-            public int SumB2;
-            //Коэффиценты для классификации
-            public double Px;
-            public double Py;
-        }
-        static void PrintCoefficients(Coefficients Fac)
+        public static Object.Block[,] RangeArray;
+        public static Object.Block[,] DomainArray;
+        public static Color[,] ClassImageColor;
+        public static double[,] BrightnessImage;
+        public static Object.Coefficients[,,] CompressCoeff;
+
+        public static BinaryWriter bw;
+        public static BlockTree[,] RangeTree;
+        public static Object.BlockArray[] DomainBlocks;
+        //public static BlockTree[,] DomainTree;
+        public static int NumLock = 0;
+        public static int BlockChecker = 0;
+        public static void PrintCoefficients(Object.Coefficients Fac)
         {
             System.Console.Write(Fac.X);
             System.Console.Write(" ");
@@ -61,9 +40,9 @@ namespace NewFractalCompression.Code
             System.Console.WriteLine();
         }
         //Создание рангового блока
-        static Block CreateBlockRange(int X, int Y, Color[,] ImageColor, int range_block_size, double[,] Brightness)
+        static public Object.Block CreateBlockRange(int X, int Y, Color[,] ImageColor, int range_block_size, double[,] Brightness)
         {
-            Block Block = new Block
+            Object.Block Block = new Object.Block
             {
                 X = X,
                 Y = Y,
@@ -71,7 +50,9 @@ namespace NewFractalCompression.Code
                 SumG = 0,
                 SumB = 0,
                 Px = 0,
-                Py = 0
+                Py = 0,
+                BlockSize = range_block_size,
+                Active = false
             };
             double BlockBrightness = 0;
             for (int i = 0; i < range_block_size; ++i)
@@ -96,9 +77,9 @@ namespace NewFractalCompression.Code
             return Block;
         }
         //Создание доменного блока
-        static Block CreateBlockDomain(int X, int Y, Color[,] ImageColor, int range_block_size, double[,] Brightness)
+        static public Object.Block CreateBlockDomain(int X, int Y, Color[,] ImageColor, int range_block_size, double[,] Brightness)
         {
-            Block Block = new Block
+            Object.Block Block = new Object.Block
             {
                 X = X,
                 Y = Y,
@@ -106,7 +87,8 @@ namespace NewFractalCompression.Code
                 SumG = 0,
                 SumB = 0,
                 Px = 0,
-                Py = 0
+                Py = 0,
+                Active = false
             };
             double BlockBrightness = 0;
             for (int i = 0; i < range_block_size; ++i)
@@ -133,7 +115,7 @@ namespace NewFractalCompression.Code
             return Block;
         }
         //Определение угла между центрами масс двух блоков (используется для классификации)
-        static double Angle(Block RangeBlock, Block DomainBlock)
+        static double Angle(Object.Block RangeBlock, Object.Block DomainBlock)
         {
             double angle = 0;
             double Vec1X = RangeBlock.Px;
@@ -150,7 +132,7 @@ namespace NewFractalCompression.Code
             return (angle);
         }
         //Отразить блок по вертикали
-        static Color[,] ReverseColor(Color[,] ImageColor, int block_size, Block Block)
+        static Color[,] ReverseColor(Color[,] ImageColor, int block_size, Object.Block Block)
         {
 
             Color[,] NewImageColor = ImageColor;
@@ -185,7 +167,7 @@ namespace NewFractalCompression.Code
             return NewImageColor;
         }
         //Поворот на 90 градусов блока во всём изображении
-        static Color[,] RotateColor(Color[,] ImageColor, int block_size, Block Block)
+        static Color[,] RotateColor(Color[,] ImageColor, int block_size, Object.Block Block)
         {
             Color[,] NewImageColor = ImageColor;
             Color[,] BlockImageColor = new Color[block_size, block_size];
@@ -222,7 +204,7 @@ namespace NewFractalCompression.Code
             return NewImageColor;
         }
         //Определение сдвига по яркости между двумя блоками
-        static double Shift(Block RangeBlock, Block DomainBlock, int range_block_size, int flag)
+        static public double Shift(Object.Block RangeBlock, Object.Block DomainBlock, int range_block_size, int flag)
         {
             double shift = 0;
             if (flag == 0)
@@ -234,7 +216,7 @@ namespace NewFractalCompression.Code
             return shift;
         }
         //Сравнение коэффицентов
-        static bool CoeffEquality(Coefficients A, Coefficients B)
+        static bool CoeffEquality(Object.Coefficients A, Object.Coefficients B)
         {
             if (A.X == B.X)
                 if (A.Y == B.Y)
@@ -263,7 +245,7 @@ namespace NewFractalCompression.Code
                         {
                             for (int l = 0; l < domain_num_height; ++l)
                             {
-                                Color[,] DomainImageColor = ImageColor;
+                                Color[,] DomainImageColor = ClassImageColor;
                                 //Выполняем выбор доменного блока, если угол его центр масс с ранговым блоком меньше определенного угла
                                 //if (Angle(RangeArray[i, j], DomainArray[k, l]) <= (Math.PI / 2))
                                 //if (true)
@@ -272,7 +254,7 @@ namespace NewFractalCompression.Code
                                     //{
                                         DomainImageColor = RotateColor(DomainImageColor, domain_block_size, DomainArray[k, l]);
                                         double shift = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, colorflag_tmp);
-                                        double distance = Metrics.DistanceClass(ImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shift, colorflag_tmp);
+                                        double distance = Metrics.DistanceClass(ClassImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shift, colorflag_tmp);
                                         if (distance < 1000000)
                                         {
                                             oneflag = true;
@@ -346,12 +328,12 @@ namespace NewFractalCompression.Code
                 }
             }
             Bitmap Image = new Bitmap(filename);
-            ImageColor = new Color[Image.Width, Image.Height];
+            ClassImageColor = new Color[Image.Width, Image.Height];
             for (int i = 0; i < Image.Width; ++i)
             {
                 for (int j = 0; j < Image.Height; ++j)
                 {
-                    ImageColor[i, j] = Image.GetPixel(i, j);
+                    ClassImageColor[i, j] = Image.GetPixel(i, j);
                 }
             }
             double[,] BrightnessImage = new double[Image.Width, Image.Height];
@@ -363,16 +345,16 @@ namespace NewFractalCompression.Code
                 }
             }
             //Основной параметр, отвечающий за размеры ранговых блоков
-            range_block_size = 4;
+            range_block_size = 2;
             //Создаём ранговые блоки
             range_num_width = Image.Width / range_block_size;
             range_num_height = Image.Height / range_block_size;
-            RangeArray = new Block[range_num_width, range_num_height];
+            RangeArray = new Object.Block[range_num_width, range_num_height];
             for (int i = 0; i < range_num_width; ++i)
             {
                 for (int j = 0; j < range_num_height; ++j)
                 {
-                    RangeArray[i, j] = CreateBlockRange(i * range_block_size, j * range_block_size, ImageColor, range_block_size, BrightnessImage);
+                    RangeArray[i, j] = CreateBlockRange(i * range_block_size, j * range_block_size, ClassImageColor, range_block_size, BrightnessImage);
                     //RangeArray[i, j].position = j + (i * range_num_width);
                     //System.Console.WriteLine(RangeArray[i, j].position);
                 }
@@ -381,12 +363,12 @@ namespace NewFractalCompression.Code
             domain_num_width = range_num_width - 1;
             domain_num_height = range_num_height - 1;
             domain_block_size = range_block_size * 2;
-            DomainArray = new Block[domain_num_width, domain_num_height];
+            DomainArray = new Object.Block[domain_num_width, domain_num_height];
             for (int i = 0; i < domain_num_width; ++i)
             {
                 for (int j = 0; j < domain_num_height; ++j)
                 {
-                    DomainArray[i, j] = CreateBlockDomain(i * range_block_size, j * range_block_size, ImageColor, range_block_size, BrightnessImage);
+                    DomainArray[i, j] = CreateBlockDomain(i * range_block_size, j * range_block_size, ClassImageColor, range_block_size, BrightnessImage);
                     //DomainArray[i, j].position = j + (i * range_num_width);
                     //System.Console.WriteLine(DomainArray[i, j].position);
                     //System.Console.WriteLine(i + " " + j);
@@ -396,7 +378,7 @@ namespace NewFractalCompression.Code
             count = 1;
             //Общеее число преобразований
             block_all_num = colorflag * range_num_width * range_num_height;
-            CompressCoeff = new Coefficients[range_num_width, range_num_height, colorflag];
+            CompressCoeff = new Object.Coefficients[range_num_width, range_num_height, colorflag];
             //StreamWriter sw = new StreamWriter(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Compression.txt");
             BinaryWriter bw = new BinaryWriter(File.Open(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Compression", FileMode.Create));
 
@@ -405,6 +387,7 @@ namespace NewFractalCompression.Code
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Width), 2));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Height), 2));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(range_block_size), 1));
+            System.Console.WriteLine(range_num_width * range_num_height);
             for (int k = 0; k < colorflag; ++k)
             {
                 for (int i = 0; i < range_num_width; ++i)
@@ -452,7 +435,7 @@ namespace NewFractalCompression.Code
             Bitmap NewImage = new Bitmap(Image_width, Image_height);
             int range_num_width = NewImage.Width / range_block_size;
             int range_num_height = NewImage.Height / range_block_size;
-            CompressCoeff = new Coefficients[range_num_width, range_num_height, 3];
+            CompressCoeff = new Object.Coefficients[range_num_width, range_num_height, 3];
             for (int k = 0; k < 3; ++k)
             {
                 for (int i = 0; i < range_num_width; ++i)
@@ -475,12 +458,13 @@ namespace NewFractalCompression.Code
 
                         Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 2);
                         CompressCoeff[i, j, k].shift = BitConverter.ToInt16(Tmp, 0);
+                        //System.Console.WriteLine(CompressCoeff[i, j, k].shift);
                         FileCount += 2;
                     }
                 }
             }
             //Создаём ранговые блоки
-            Block[,] RangeArray = new Block[range_num_width, range_num_height];
+            Object.Block[,] RangeArray = new Object.Block[range_num_width, range_num_height];
             for (int i = 0; i < range_num_width; ++i)
             {
                 for (int j = 0; j < range_num_height; ++j)
@@ -493,7 +477,7 @@ namespace NewFractalCompression.Code
             int domain_num_width = range_num_width - 1;
             int domain_num_height = range_num_height - 1;
             int domain_block_size = range_block_size * 2;
-            Block[,] DomainArray = new Block[domain_num_width, domain_num_height];
+            Object.Block[,] DomainArray = new Object.Block[domain_num_width, domain_num_height];
             for (int i = 0; i < domain_num_width; ++i)
             {
                 for (int j = 0; j < domain_num_height; ++j)
@@ -520,14 +504,14 @@ namespace NewFractalCompression.Code
                 {
                     for (int j = 0; j < range_num_height; ++j)
                     {
-                        Block RangeBlock = RangeArray[i, j];
-                        Coefficients Current_coefficentR = CompressCoeff[i, j, 0];
-                        Coefficients Current_coefficentG = CompressCoeff[i, j, 1];
-                        Coefficients Current_coefficentB = CompressCoeff[i, j, 2];
+                        Object.Block RangeBlock = RangeArray[i, j];
+                        Object.Coefficients Current_coefficentR = CompressCoeff[i, j, 0];
+                        Object.Coefficients Current_coefficentG = CompressCoeff[i, j, 1];
+                        Object.Coefficients Current_coefficentB = CompressCoeff[i, j, 2];
 
-                        Block DomainBlockR = DomainArray[Current_coefficentR.X, Current_coefficentR.Y];
-                        Block DomainBlockG = DomainArray[Current_coefficentG.X, Current_coefficentG.Y];
-                        Block DomainBlockB = DomainArray[Current_coefficentB.X, Current_coefficentB.Y];
+                        Object.Block DomainBlockR = DomainArray[Current_coefficentR.X, Current_coefficentR.Y];
+                        Object.Block DomainBlockG = DomainArray[Current_coefficentG.X, Current_coefficentG.Y];
+                        Object.Block DomainBlockB = DomainArray[Current_coefficentB.X, Current_coefficentB.Y];
 
                         ////Зеркальное отражение блоков
                         //if (Current_coefficentR.rotate > 3)
@@ -618,7 +602,7 @@ namespace NewFractalCompression.Code
             Bitmap NewImage = new Bitmap(Image_width, Image_height);
             int range_num_width = NewImage.Width / range_block_size;
             int range_num_height = NewImage.Height / range_block_size;
-            CompressCoeff = new Coefficients[range_num_width, range_num_height, 3];
+            CompressCoeff = new Object.Coefficients[range_num_width, range_num_height, 3];
             for (int k = 0; k < 1; ++k)
             {
                 for (int i = 0; i < range_num_width; ++i)
@@ -661,7 +645,7 @@ namespace NewFractalCompression.Code
             //}
             //System.Console.WriteLine(RW);
             //Создаём ранговые блоки
-            Block[,] RangeArray = new Block[range_num_width, range_num_height];
+            Object.Block[,] RangeArray = new Object.Block[range_num_width, range_num_height];
             for (int i = 0; i < range_num_width; ++i)
             {
                 for (int j = 0; j < range_num_height; ++j)
@@ -674,7 +658,7 @@ namespace NewFractalCompression.Code
             int domain_num_width = range_num_width - 1;
             int domain_num_height = range_num_height - 1;
             int domain_block_size = range_block_size * 2;
-            Block[,] DomainArray = new Block[domain_num_width, domain_num_height];
+            Object.Block[,] DomainArray = new Object.Block[domain_num_width, domain_num_height];
             for (int i = 0; i < domain_num_width; ++i)
             {
                 for (int j = 0; j < domain_num_height; ++j)
@@ -699,10 +683,10 @@ namespace NewFractalCompression.Code
                 {
                     for (int j = 0; j < range_num_height; ++j)
                     {
-                        Block RangeBlock = RangeArray[i, j];
-                        Coefficients Current_coefficentR = CompressCoeff[i, j, 0];
+                        Object.Block RangeBlock = RangeArray[i, j];
+                        Object.Coefficients Current_coefficentR = CompressCoeff[i, j, 0];
 
-                        Block DomainBlockR = DomainArray[Current_coefficentR.X, Current_coefficentR.Y];
+                        Object.Block DomainBlockR = DomainArray[Current_coefficentR.X, Current_coefficentR.Y];
 
                         //System.Console.WriteLine(Current_coefficentR.rotate);
                         //for (int rotate = 0; rotate <= Current_coefficentR.rotate; ++rotate)
@@ -734,39 +718,30 @@ namespace NewFractalCompression.Code
             }
             NewImage.Save(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Expanded file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
         }
-        static public void CheckRotate(string filename)
+        //Пока никак не используется
+        static public bool CheckMonotoneBlock(Object.Block block)
         {
-            Bitmap Image = new Bitmap(filename);
-            ImageColor = new Color[Image.Width, Image.Height];
-            for (int i = 0; i < Image.Width; ++i)
+            bool flag = true;
+            int Count = 0;
+            Color CurrentColor = ClassImageColor[block.X, block.Y];
+            for (int i = 0; i < block.BlockSize - 1; ++i)
             {
-                for (int j = 0; j < Image.Height; ++j)
+                for (int j = 1; j < block.BlockSize - 1; ++j)
                 {
-                    ImageColor[i, j] = Image.GetPixel(i, j);
+                    //if (CurrentColor != ClassImageColor[block.X + i + 1, block.Y + j + 1])
+                    if (ClassImageColor[block.X + i, block.Y + j] != ClassImageColor[block.X + i + 1, block.Y + j + 1])
+                    {
+                        ++Count;
+                    }
                 }
             }
-            double[,] BrightnessImage = new double[Image.Width, Image.Height];
-            for (int i = 0; i < Image.Width; ++i)
-            {
-                for (int j = 0; j < Image.Height; ++j)
-                {
-                    BrightnessImage[i, j] = Image.GetPixel(i, j).GetBrightness();
-                }
-            }
-            for (int i = 0; i < 3; ++i)
-                ImageColor = RotateColor(ImageColor, 256, CreateBlockDomain(0, 0, ImageColor, 256, BrightnessImage));
-            Bitmap NewImage = new Bitmap(Image.Width, Image.Height);
-            for (int i = 0; i < Image.Width; ++i)
-            {
-                for (int j = 0; j < Image.Height; ++j)
-                {
-                    NewImage.SetPixel(i, j, ImageColor[i, j]);
-                }
-            }
-            NewImage.Save(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Test Rotate.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
-
+            //Варианты выбора монотоннсоти
+            //if (Count > (block.BlockSize * block.BlockSize / 4))
+            //    flag = false;
+            if (Count > ((block.BlockSize)))
+                flag = false;
+            return flag;
         }
-        //Один из вариантов
         static public void NewParallCompress(int istart)
         {
             for (int colorflag_tmp = 0; colorflag_tmp < 1; ++colorflag_tmp)
@@ -789,28 +764,18 @@ namespace NewFractalCompression.Code
                         {
                             for (int l = 0; l < domain_num_height; ++l)
                             {
-                                Color[,] DomainImageColor = ImageColor;
+                                Color[,] DomainImageColor = ClassImageColor;
                                 //Выполняем выбор доменного блока, если угол его центр масс с ранговым блоком меньше определенного угла
                                 //if (Angle(RangeArray[i, j], DomainArray[k, l]) <= (Math.PI / 2))
                                 //DomainImageColor = RotateColor(DomainImageColor, domain_block_size, DomainArray[k, l]);
                                 double shiftR = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, 0);
                                 double shiftG = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, 1);
                                 double shiftB = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, 2);
-                                //if (shiftR < current_shiftR)
-                                //{
-                                //    current_x = k;
-                                //    current_y = l;
-                                //    current_shiftR = shiftR;
-                                //    current_shiftG = shiftG;
-                                //    current_shiftB = shiftB;
-                                //    //current_distance = distance;
-                                //    //current_rotate = rotate;
-                                //    //current_rotate = 0;
-                                //}
+
                                 //System.Console.WriteLine(Angle(RangeArray[i, j], DomainArray[k, l]));
                                 //if (Angle(RangeArray[i, j], DomainArray[k, l]) <= 2)
                                 {
-                                    double distance = Metrics.DistanceClass(ImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shiftR, colorflag_tmp);
+                                    double distance = Metrics.DistanceClass(ClassImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shiftR, colorflag_tmp);
                                     //double distance = Metrics.DistanceShar(ImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shiftR, colorflag_tmp);
                                     //double distance = Metrics.PSNR(ImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shiftR, colorflag_tmp);
                                     if (distance < 10000000)
@@ -827,8 +792,7 @@ namespace NewFractalCompression.Code
                                     }
                                     else
                                     {
-                                        //if (distance < current_distance)
-                                        if (shiftR < current_shiftR)
+                                        if (distance < current_distance)
                                         {
                                             current_x = k;
                                             current_y = l;
@@ -852,7 +816,7 @@ namespace NewFractalCompression.Code
                             //System.Console.Write(proc);
                             //System.Console.Write(" %");
                             //System.Console.WriteLine();
-                            ++count;
+                            //++count;
                             CompressCoeff[i, j, colorflag_tmp].X = current_x;
                             CompressCoeff[i, j, colorflag_tmp].Y = current_y;
                             CompressCoeff[i, j, colorflag_tmp].rotate = current_rotate;
@@ -883,9 +847,9 @@ namespace NewFractalCompression.Code
                         double current_shiftB = 0;
                         int current_rotate = 0;
                        // bool oneflag = false;
-                        for (int rand = 0; rand < 10; ++rand)
+                        for (int rand = 0; rand < 1; ++rand)
                         {
-                            Color[,] DomainImageColor = ImageColor;
+                            Color[,] DomainImageColor = ClassImageColor;
                             //Выполняем выбор доменного блока, если угол его центр масс с ранговым блоком меньше определенного угла
                             //if (Angle(RangeArray[i, j], DomainArray[k, l]) <= (Math.PI / 2))
                             Random random = new Random();
@@ -899,7 +863,7 @@ namespace NewFractalCompression.Code
                             double shiftR = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, 0);
                             double shiftG = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, 1);
                             double shiftB = Shift(RangeArray[i, j], DomainArray[k, l], range_block_size, 2);
-                            double distance = Metrics.DistanceClass(ImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shiftR, colorflag_tmp);
+                            double distance = Metrics.DistanceClass(ClassImageColor, DomainImageColor, RangeArray[i, j], DomainArray[k, l], range_block_size, shiftR, colorflag_tmp);
                             //if (distance < 0)
                             if (distance < current_distance)
                             {
@@ -958,6 +922,286 @@ namespace NewFractalCompression.Code
                 }
             }
         }
+        static public void NewQuadCompression(string filename, string quality)
+        {
+            if (!(File.Exists(filename)))
+            {
+                System.Console.WriteLine("Файла не существует");
+                return;
+            }
+            //Черно-белый файл или нет
+            if (quality == "Black")
+            {
+                colorflag = 1;
+            }
+            else
+            {
+                if (quality == "Color")
+                {
+                    colorflag = 3;
+                }
+                else
+                {
+                    System.Console.WriteLine("Тип выбран не правильно");
+                    return;
+                }
+            }
+            Bitmap Image = new Bitmap(filename);
+            ClassImageColor = new Color[Image.Width, Image.Height];
+            for (int i = 0; i < Image.Width; ++i)
+            {
+                for (int j = 0; j < Image.Height; ++j)
+                {
+                    ClassImageColor[i, j] = Image.GetPixel(i, j);
+                }
+            }
+            BrightnessImage = new double[Image.Width, Image.Height];
+            for (int i = 0; i < Image.Width; ++i)
+            {
+                for (int j = 0; j < Image.Height; ++j)
+                {
+                    BrightnessImage[i, j] = Image.GetPixel(i, j).GetBrightness();
+                }
+            }
+            //Создаём ранговое дерево
+            range_block_size = 32;
+            range_num_width = Image.Width / range_block_size;
+            range_num_height = Image.Height / range_block_size;
+            RangeArray = new Object.Block[range_num_width, range_num_height];
+            //Изначально создаются ранговые блоки, на основе которых будут составляться деревья
+            for (int i = 0; i < range_num_width; ++i)
+            {
+                for (int j = 0; j < range_num_height; ++j)
+                {
+                    RangeArray[i, j] = CreateBlockRange(i * range_block_size, j * range_block_size, ClassImageColor, range_block_size, BrightnessImage);
+                }
+            }
+            RangeTree = new BlockTree[range_num_width, range_num_height];
+            for (int i = 0; i < range_num_width; ++i)
+            {
+                for (int j = 0; j < range_num_height; ++j)
+                {
+                    NumLock = 1;
+                    BlockChecker = 0;
+                    RangeTree[i, j] = new BlockTree(RangeArray[i, j], RangeArray[i, j].BlockSize);
+                }
+            }
+            //Доменные блоки представлены не в виде деревьев, а в виде трехмерных массивов
+            domain_num_width = range_num_width - 1;
+            domain_num_height = range_num_height - 1;
+            domain_block_size = range_block_size * 2;
+            DomainArray = new Object.Block[domain_num_width, domain_num_height];
+            //System.Console.WriteLine(DomainBlocks.Length);
+            DomainBlocks = new Object.BlockArray[Post.GetPow(domain_block_size)];
+            for (int i = 0; i < DomainBlocks.Length; ++i)
+            {
+                if (i == 0)
+                    DomainBlocks[i].BlockSize = domain_block_size;
+                else
+                    DomainBlocks[i].BlockSize = DomainBlocks[i - 1].BlockSize / 2;
+                DomainBlocks[i].num_width = Image.Width / DomainBlocks[i].BlockSize;
+                DomainBlocks[i].num_height = Image.Height / DomainBlocks[i].BlockSize;
+                DomainBlocks[i].Blocks = new Object.Block[DomainBlocks[i].num_width, DomainBlocks[i].num_height];
+                for (int j = 0; j < DomainBlocks[i].num_width; ++j)
+                {
+                    for (int k = 0; k < DomainBlocks[i].num_height; ++k)
+                    {
+                        DomainBlocks[i].Blocks[j, k] = CreateBlockDomain(j * DomainBlocks[i].BlockSize / 2, k * DomainBlocks[i].BlockSize / 2, ClassImageColor, DomainBlocks[i].BlockSize / 2, BrightnessImage);
+                    }
+                }
+            }
+            bw = new BinaryWriter(File.Open(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad Compression", FileMode.Create));
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Width), 2));
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Height), 2));
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(range_block_size), 1));
+            //Обход всех деревьев и нахождение для нужных коэффициентов преобразования, а так же выписывание их в файл
+            for (int i = 0; i < range_num_width; ++i)
+            {
+                for (int j = 0; j < range_num_height; ++j)
+                {
+                    RangeTree[i, j].RoundTree(RangeTree[i, j], DomainBlocks, ClassImageColor, RangeTree[i, j].MainBlock.BlockSize, bw);
+                }
+            }
+
+            Bitmap NewImage = new Bitmap(Image.Width, Image.Height);
+            Color[,] NewImageColor = new Color[NewImage.Width, NewImage.Height];
+            for (int j = 0; j < NewImage.Width; ++j)
+            {
+                for (int k = 0; k < NewImage.Height; ++k)
+                {
+                    NewImageColor[j, k] = NewImage.GetPixel(j, k);
+                }
+            }
+            //Построение изображения из деревьев
+            for (int i = 0; i < 10; ++i)
+            {
+                for (int j = 0; j < range_num_width; ++j)
+                {
+                    for (int k = 0; k < range_num_height; ++k)
+                    {
+                        RangeTree[j, k].DrawTree(RangeTree[j, k], DomainBlocks, NewImageColor);
+                    }
+                }
+            }
+            for (int j = 0; j < NewImage.Width; ++j)
+            {
+                for (int k = 0; k < NewImage.Height; ++k)
+                {
+                    NewImage.SetPixel(j, k, NewImageColor[j, k]);
+                }
+            }
+            NewImage.Save(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+            bw.Close();
+        }
+        static public void NewQuadDecompression()
+        {
+            byte[] BytesFile = File.ReadAllBytes(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad Compression");
+            int FileCount = 0;
+            //Коэффициент масштабирования
+            int Scale = 1;
+
+            Byte[] Tmp = MyConverter.ReadByte(BytesFile, 0, 2);
+            int Image_width = BitConverter.ToInt16(Tmp, 0) * Scale;
+            //+
+            FileCount += 2;
+
+            Tmp = MyConverter.ReadByte(BytesFile, 2, 4);
+            int Image_height = BitConverter.ToInt16(Tmp, 0) * Scale;
+            //+
+
+            FileCount += 2;
+            Tmp = MyConverter.ReadByte(BytesFile, 4, 5);
+            int range_block_size = Tmp[0] * Scale;
+            //+
+     
+            FileCount += 1;
+            Bitmap NewImage = new Bitmap(Image_width, Image_height);
+            Color[,] NewImageColor = new Color[NewImage.Width, NewImage.Height];
+            BrightnessImage = new double[NewImage.Width, NewImage.Height];
+            for (int i = 0; i < NewImage.Width; ++i)
+            {
+                for (int j = 0; j < NewImage.Height; ++j)
+                {
+                    BrightnessImage[i, j] = NewImage.GetPixel(i, j).GetBrightness();
+                }
+            }
+
+            int range_num_width = NewImage.Width / range_block_size;
+            int range_num_height = NewImage.Height / range_block_size;
+            Object.Block[,] RangeArray = new Object.Block[range_num_width, range_num_height];
+            for (int i = 0; i < range_num_width; ++i)
+            {
+                for (int j = 0; j < range_num_height; ++j)
+                {
+                    RangeArray[i, j].X = i * range_block_size;
+                    RangeArray[i, j].Y = j * range_block_size;
+                }
+            }
+            RangeTree = new BlockTree[range_num_width, range_num_height];
+            for (int i = 0; i < range_num_width; ++i)
+            {
+                for (int j = 0; j < range_num_height; ++j)
+                {
+                    NumLock = 1;
+                    RangeTree[i, j] = new BlockTree(RangeArray[i, j], RangeArray[i, j].BlockSize);
+                }
+            }
+            //Доменные блоки представлены не в виде деревьев, а в виде трехмерных массивов
+            domain_num_width = range_num_width - 1;
+            domain_num_height = range_num_height - 1;
+            domain_block_size = range_block_size * 2;
+            DomainArray = new Object.Block[domain_num_width, domain_num_height];
+            //System.Console.WriteLine(DomainBlocks.Length);
+            DomainBlocks = new Object.BlockArray[Post.GetPow(domain_block_size)];
+            for (int i = 0; i < DomainBlocks.Length; ++i)
+            {
+                if (i == 0)
+                    DomainBlocks[i].BlockSize = domain_block_size;
+                else
+                    DomainBlocks[i].BlockSize = DomainBlocks[i - 1].BlockSize / 2;
+                DomainBlocks[i].num_width = NewImage.Width / DomainBlocks[i].BlockSize;
+                DomainBlocks[i].num_height = NewImage.Height / DomainBlocks[i].BlockSize;
+                DomainBlocks[i].Blocks = new Object.Block[DomainBlocks[i].num_width, DomainBlocks[i].num_height];
+                for (int j = 0; j < DomainBlocks[i].num_width; ++j)
+                {
+                    for (int k = 0; k < DomainBlocks[i].num_height; ++k)
+                    {
+                        DomainBlocks[i].Blocks[j, k] = CreateBlockDomain(j * DomainBlocks[i].BlockSize / 2, k * DomainBlocks[i].BlockSize / 2, NewImageColor, DomainBlocks[i].BlockSize / 2, BrightnessImage);
+                    }
+                }
+            }
+            Object.Coefficients Coeff = new Object.Coefficients();
+            int blI = 0, blJ = -1;
+            while (Tmp != null)
+            {
+                if (BytesFile.Length == FileCount)
+                    break;
+                Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 1);
+                Coeff.Depth = Tmp[0];
+                ++FileCount;
+
+                if (Tmp == null)
+                    break;
+
+                Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 1);
+                Coeff.X = Tmp[0];
+                FileCount += 1;
+
+                Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 1);
+                Coeff.Y = Tmp[0];
+                FileCount += 1;
+
+                Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 2);
+                Coeff.shiftR = BitConverter.ToInt16(Tmp, 0);
+                FileCount += 2;
+
+                Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 2);
+                Coeff.shiftG = BitConverter.ToInt16(Tmp, 0);
+                FileCount += 2;
+                Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 2);
+                Coeff.shiftB = BitConverter.ToInt16(Tmp, 0);
+                FileCount += 2;
+
+                RangeTree[blI, blJ].AddCoeff(RangeTree[blI, blJ], Coeff);
+                System.Console.WriteLine(blJ + " " + blI);
+                if (Coeff.Depth < 0)
+                {
+                    ++blJ;
+                }
+                if (blJ == range_num_height - 1)
+                {
+                    ++blI;
+                }
+            }
+            for (int j = 0; j < NewImage.Width; ++j)
+            {
+                for (int k = 0; k < NewImage.Height; ++k)
+                {
+                    NewImageColor[j, k] = NewImage.GetPixel(j, k);
+                }
+            }
+            //Построение изображения из деревьев
+            for (int i = 0; i < 10; ++i)
+            {
+                for (int j = 0; j < range_num_width; ++j)
+                {
+                    for (int k = 0; k < range_num_height; ++k)
+                    {
+                        System.Console.WriteLine(i + " " + j);
+                        RangeTree[j, k].DrawTree(RangeTree[j, k], DomainBlocks, NewImageColor);
+                    }
+                    System.Console.WriteLine("-----------");
+                }
+            }
+            for (int j = 0; j < NewImage.Width; ++j)
+            {
+                for (int k = 0; k < NewImage.Height; ++k)
+                {
+                    NewImage.SetPixel(j, k, NewImageColor[j, k]);
+                }
+            }
+            NewImage.Save(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+        }
         static public void NewCompression(string filename, string quality)
         {
             if (!(File.Exists(filename)))
@@ -983,12 +1227,12 @@ namespace NewFractalCompression.Code
                 }
             }
             Bitmap Image = new Bitmap(filename);
-            ImageColor = new Color[Image.Width, Image.Height];
+            ClassImageColor = new Color[Image.Width, Image.Height];
             for (int i = 0; i < Image.Width; ++i)
             {
                 for (int j = 0; j < Image.Height; ++j)
                 {
-                    ImageColor[i, j] = Image.GetPixel(i, j);
+                    ClassImageColor[i, j] = Image.GetPixel(i, j);
                 }
             }
             double[,] BrightnessImage = new double[Image.Width, Image.Height];
@@ -1000,28 +1244,28 @@ namespace NewFractalCompression.Code
                 }
             }
             //Основной параметр, отвечающий за размеры ранговых блоков
-            range_block_size = 4;
+            range_block_size = 16;
             //Создаём ранговые блоки
             range_num_width = Image.Width / range_block_size;
             range_num_height = Image.Height / range_block_size;
-            RangeArray = new Block[range_num_width, range_num_height];
+            RangeArray = new Object.Block[range_num_width, range_num_height];
             for (int i = 0; i < range_num_width; ++i)
             {
                 for (int j = 0; j < range_num_height; ++j)
                 {
-                    RangeArray[i, j] = CreateBlockRange(i * range_block_size, j * range_block_size, ImageColor, range_block_size, BrightnessImage);
+                    RangeArray[i, j] = CreateBlockRange(i * range_block_size, j * range_block_size, ClassImageColor, range_block_size, BrightnessImage);
                 }
             }
             //Создаем доменные блоки
             domain_num_width = range_num_width - 1;
             domain_num_height = range_num_height - 1;
             domain_block_size = range_block_size * 2;
-            DomainArray = new Block[domain_num_width, domain_num_height];
+            DomainArray = new Object.Block[domain_num_width, domain_num_height];
             for (int i = 0; i < domain_num_width; ++i)
             {
                 for (int j = 0; j < domain_num_height; ++j)
                 {
-                    DomainArray[i, j] = CreateBlockDomain(i * range_block_size, j * range_block_size, ImageColor, range_block_size, BrightnessImage);
+                    DomainArray[i, j] = CreateBlockDomain(i * range_block_size, j * range_block_size, ClassImageColor, range_block_size, BrightnessImage);
                 }
             }
             //domain_block_size = range_block_size * 2;
@@ -1039,14 +1283,14 @@ namespace NewFractalCompression.Code
             count = 1;
             //Общеее число преобразований
             block_all_num = colorflag * range_num_width * range_num_height;
-            CompressCoeff = new Coefficients[range_num_width, range_num_height, 1];
+            CompressCoeff = new Object.Coefficients[range_num_width, range_num_height, 1];
             //StreamWriter sw = new StreamWriter(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Compression.txt");
             BinaryWriter bw = new BinaryWriter(File.Open(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Compression", FileMode.Create));
-            for (int i = 0; i < range_num_width; ++i)
-            {
-                NewParallCompress(i);
-            }
-            //Parallel.For(0, range_num_width, NewParallCompress);
+            //for (int i = 0; i < range_num_width; ++i)
+            //{
+            //    NewParallCompress(i);
+            //}
+            Parallel.For(0, range_num_width, NewParallCompress);
             //Parallel.For(0, range_num_width, NewParallCompressRandom);
             //Выводим коэффиценты в файл
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Width), 2));
@@ -1104,7 +1348,7 @@ namespace NewFractalCompression.Code
             Bitmap NewImage = new Bitmap(Image_width, Image_height);
             int range_num_width = NewImage.Width / range_block_size;
             int range_num_height = NewImage.Height / range_block_size;
-            CompressCoeff = new Coefficients[range_num_width, range_num_height, 1];
+            CompressCoeff = new Object.Coefficients[range_num_width, range_num_height, 1];
             for (int i = 0; i < range_num_width; ++i)
             {
                 for (int j = 0; j < range_num_height; ++j)
@@ -1130,7 +1374,7 @@ namespace NewFractalCompression.Code
                 }
             }
             //Создаём ранговые блоки
-            Block[,] RangeArray = new Block[range_num_width, range_num_height];
+            Object.Block[,] RangeArray = new Object.Block[range_num_width, range_num_height];
             for (int i = 0; i < range_num_width; ++i)
             {
                 for (int j = 0; j < range_num_height; ++j)
@@ -1143,7 +1387,7 @@ namespace NewFractalCompression.Code
             int domain_num_width = range_num_width - 1;
             int domain_num_height = range_num_height - 1;
             int domain_block_size = range_block_size * 2;
-            Block[,] DomainArray = new Block[domain_num_width, domain_num_height];
+            Object.Block[,] DomainArray = new Object.Block[domain_num_width, domain_num_height];
             for (int i = 0; i < domain_num_width; ++i)
             {
                 for (int j = 0; j < domain_num_height; ++j)
@@ -1187,10 +1431,10 @@ namespace NewFractalCompression.Code
                 {
                     for (int j = 0; j < range_num_height; ++j)
                     {
-                        Block RangeBlock = RangeArray[i, j];
-                        Coefficients Current_coefficentR = CompressCoeff[i, j, 0];
+                        Object.Block RangeBlock = RangeArray[i, j];
+                        Object.Coefficients Current_coefficentR = CompressCoeff[i, j, 0];
 
-                        Block DomainBlockR = DomainArray[Current_coefficentR.X, Current_coefficentR.Y];
+                        Object.Block DomainBlockR = DomainArray[Current_coefficentR.X, Current_coefficentR.Y];
                         for (int pix_x = 0; pix_x < range_block_size; ++pix_x)
                         {
                             for (int pix_y = 0; pix_y < range_block_size; ++pix_y)
