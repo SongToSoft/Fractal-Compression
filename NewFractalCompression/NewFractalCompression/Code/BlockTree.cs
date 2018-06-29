@@ -87,14 +87,14 @@ namespace NewFractalCompression.Code
             }
         }
         //Обход дерева и нахождение для нужных узлов коэффициентов
-        public void RoundTree(BlockTree RangeTree, Object.BlockArray[] DomainArray, Color[,] ClassImageColor, int range_block_size, BinaryWriter bw)
+        public void RoundTree(BlockTree RangeTree, Object.BlockArray[] DomainArray, Color[,] ClassImageColor, int range_block_size)
         {
             if (!(CompressionClass.CheckMonotoneBlock(RangeTree.MainBlock)) && (RangeTree.MainBlock.BlockSize > 2))
             {
-                RoundTree(RangeTree.UL, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize, bw);
-                RoundTree(RangeTree.UR, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize, bw);
-                RoundTree(RangeTree.DL, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize, bw);
-                RoundTree(RangeTree.DR, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize, bw);
+                RoundTree(RangeTree.UL, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
+                RoundTree(RangeTree.UR, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
+                RoundTree(RangeTree.DL, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
+                RoundTree(RangeTree.DR, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
             }
             else
             {
@@ -158,29 +158,35 @@ namespace NewFractalCompression.Code
                 RangeTree.MainBlock.Coeff.shiftR = (int)current_shiftR;
                 RangeTree.MainBlock.Coeff.shiftG = (int)current_shiftG;
                 RangeTree.MainBlock.Coeff.shiftB = (int)current_shiftB;
+                RangeTree.MainBlock.Coeff.Depth = RangeTree.MainBlock.Depth;
                 if (CompressionClass.BlockChecker == 0)
-                    RangeTree.MainBlock.Depth *= (-1);
+                    RangeTree.MainBlock.Coeff.Depth *= (-1);
                 ++CompressionClass.BlockChecker;
+                CompressionClass.ListCoeff.Add(RangeTree.MainBlock.Coeff);
                 //System.Console.WriteLine(RangeTree.MainBlock.Depth);
                 //Запись в файл всех нужные чисел, а так же глубину нахождения узла в дереве
-                Byte[] D = BitConverter.GetBytes(RangeTree.MainBlock.Depth);
-                Byte[] X = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.X);
-                Byte[] Y = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.Y);
-                Byte[] SR = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.shiftR);
-                Byte[] SG = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.shiftG);
-                Byte[] SB = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.shiftB);
-             
-                bw.Write(MyConverter.Convert(D, 1));
-                bw.Write(MyConverter.Convert(X, 1));
-                bw.Write(MyConverter.Convert(Y, 1));
-                bw.Write(MyConverter.Convert(SR, 2));
-                bw.Write(MyConverter.Convert(SG, 2));
-                bw.Write(MyConverter.Convert(SB, 2));
+                //Byte[] D = BitConverter.GetBytes(RangeTree.MainBlock.Depth);
+                //Byte[] X = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.X);
+                //Byte[] Y = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.Y);
+                //Byte[] SR = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.shiftR);
+                //Byte[] SG = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.shiftG);
+                //Byte[] SB = BitConverter.GetBytes(RangeTree.MainBlock.Coeff.shiftB);
+
+                //bw.Write(MyConverter.Convert(D, 1));
+                //bw.Write(MyConverter.Convert(X, 1));
+                //bw.Write(MyConverter.Convert(Y, 1));
+                //bw.Write(MyConverter.Convert(SR, 2));
+                //bw.Write(MyConverter.Convert(SG, 2));
+                //bw.Write(MyConverter.Convert(SB, 2));
             }
         }
         //Добавить коэффициент в дерево
         public void AddCoeff(BlockTree RangeTree, Object.Coefficients Coeff)
         {
+            if (Coeff.Depth < 0)
+            {
+                Coeff.Depth *= (-1);
+            }
             if (Coeff.Depth == RangeTree.MainBlock.Depth)
             {
                 RangeTree.MainBlock.Active = true;

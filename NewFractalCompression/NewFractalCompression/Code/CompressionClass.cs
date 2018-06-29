@@ -12,16 +12,17 @@ namespace NewFractalCompression.Code
     class CompressionClass
     {
         private static double U = 0.75;
-        public static int range_num_width, range_num_height;
-        public static int domain_num_width, domain_num_height;
-        public static int range_block_size, domain_block_size, colorflag;
-        public static int count, block_all_num;
-        public static Object.Block[,] RangeArray;
-        public static Object.Block[,] DomainArray;
-        public static Color[,] ClassImageColor;
-        public static double[,] BrightnessImage;
-        public static Object.Coefficients[,,] CompressCoeff;
+        private static int range_num_width, range_num_height;
+        private static int domain_num_width, domain_num_height;
+        private static int range_block_size, domain_block_size, colorflag;
+        private static int count, block_all_num;
+        private static Object.Block[,] RangeArray;
+        private static Object.Block[,] DomainArray;
+        private static Object.Coefficients[,,] CompressCoeff;
 
+        public static List<Object.Coefficients> ListCoeff;
+        public static double[,] BrightnessImage;
+        public static Color[,] ClassImageColor;
         public static BinaryWriter bw;
         public static BlockTree[,] RangeTree;
         public static Object.BlockArray[] DomainBlocks;
@@ -30,13 +31,20 @@ namespace NewFractalCompression.Code
         public static int BlockChecker = 0;
         public static void PrintCoefficients(Object.Coefficients Fac)
         {
+            System.Console.Write(Fac.Depth);
+            System.Console.Write(" ");
             System.Console.Write(Fac.X);
             System.Console.Write(" ");
             System.Console.Write(Fac.Y);
             System.Console.Write(" ");
-            System.Console.Write(Fac.rotate);
-            System.Console.Write(" ");
-            System.Console.Write(Fac.shift);
+            //System.Console.Write(" ");
+            //System.Console.Write(Fac.rotate);
+            //System.Console.Write(" ");
+            //System.Console.Write(Fac.shiftR);
+            //System.Console.Write(" ");
+            //System.Console.Write(Fac.shiftG);
+            //System.Console.Write(" ");
+            //System.Console.Write(Fac.shiftB);
             System.Console.WriteLine();
         }
         //Создание рангового блока
@@ -718,7 +726,6 @@ namespace NewFractalCompression.Code
             }
             NewImage.Save(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Expanded file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
         }
-        //Пока никак не используется
         static public bool CheckMonotoneBlock(Object.Block block)
         {
             bool flag = true;
@@ -922,7 +929,8 @@ namespace NewFractalCompression.Code
                 }
             }
         }
-        static public void NewQuadCompression(string filename, string quality)
+        //Сжатие с использование квадродеревьев
+        static public void QuadCompression(string filename, string quality)
         {
             if (!(File.Exists(filename)))
             {
@@ -964,7 +972,7 @@ namespace NewFractalCompression.Code
                 }
             }
             //Создаём ранговое дерево
-            range_block_size = 32;
+            range_block_size = 16;
             range_num_width = Image.Width / range_block_size;
             range_num_height = Image.Height / range_block_size;
             RangeArray = new Object.Block[range_num_width, range_num_height];
@@ -982,7 +990,6 @@ namespace NewFractalCompression.Code
                 for (int j = 0; j < range_num_height; ++j)
                 {
                     NumLock = 1;
-                    BlockChecker = 0;
                     RangeTree[i, j] = new BlockTree(RangeArray[i, j], RangeArray[i, j].BlockSize);
                 }
             }
@@ -1010,50 +1017,78 @@ namespace NewFractalCompression.Code
                     }
                 }
             }
-            bw = new BinaryWriter(File.Open(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad Compression", FileMode.Create));
-            bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Width), 2));
-            bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Height), 2));
-            bw.Write(MyConverter.Convert(BitConverter.GetBytes(range_block_size), 1));
+            ListCoeff = new List<Object.Coefficients>();
             //Обход всех деревьев и нахождение для нужных коэффициентов преобразования, а так же выписывание их в файл
             for (int i = 0; i < range_num_width; ++i)
             {
                 for (int j = 0; j < range_num_height; ++j)
                 {
-                    RangeTree[i, j].RoundTree(RangeTree[i, j], DomainBlocks, ClassImageColor, RangeTree[i, j].MainBlock.BlockSize, bw);
+                    BlockChecker = 0;
+                    RangeTree[i, j].RoundTree(RangeTree[i, j], DomainBlocks, ClassImageColor, RangeTree[i, j].MainBlock.BlockSize);
                 }
             }
-
-            Bitmap NewImage = new Bitmap(Image.Width, Image.Height);
-            Color[,] NewImageColor = new Color[NewImage.Width, NewImage.Height];
-            for (int j = 0; j < NewImage.Width; ++j)
+            //for (int i = 0; i < ListCoeff.Count; ++i)
+            //{
+            //    PrintCoefficients(ListCoeff[i]);
+            //}
+            bw = new BinaryWriter(File.Open(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad Compression", FileMode.Create));
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Width), 2));
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(Image.Height), 2));
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(range_block_size), 1));
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(ListCoeff.Count), 4));
+            //System.Console.WriteLine(Image.Width);
+            //System.Console.WriteLine(Image.Height);
+            //System.Console.WriteLine(range_block_size);
+            //System.Console.WriteLine(ListCoeff.Count);
+            for (int i = 0; i < ListCoeff.Count; ++i)
             {
-                for (int k = 0; k < NewImage.Height; ++k)
-                {
-                    NewImageColor[j, k] = NewImage.GetPixel(j, k);
-                }
+                //Запись в файл всех нужные чисел, а так же глубину нахождения узла в дереве
+                Byte[] D = BitConverter.GetBytes(ListCoeff[i].Depth);
+                Byte[] X = BitConverter.GetBytes(ListCoeff[i].X);
+                Byte[] Y = BitConverter.GetBytes(ListCoeff[i].Y);
+                Byte[] SR = BitConverter.GetBytes(ListCoeff[i].shiftR);
+                Byte[] SG = BitConverter.GetBytes(ListCoeff[i].shiftG);
+                Byte[] SB = BitConverter.GetBytes(ListCoeff[i].shiftB);
+                System.Console.WriteLine(ListCoeff[i].Depth + " -- " + D[0]);
+                bw.Write(MyConverter.Convert(D, 1));
+                bw.Write(MyConverter.Convert(X, 1));
+                bw.Write(MyConverter.Convert(Y, 1));
+                bw.Write(MyConverter.Convert(SR, 2));
+                bw.Write(MyConverter.Convert(SG, 2));
+                bw.Write(MyConverter.Convert(SB, 2));
             }
-            //Построение изображения из деревьев
-            for (int i = 0; i < 10; ++i)
-            {
-                for (int j = 0; j < range_num_width; ++j)
-                {
-                    for (int k = 0; k < range_num_height; ++k)
-                    {
-                        RangeTree[j, k].DrawTree(RangeTree[j, k], DomainBlocks, NewImageColor);
-                    }
-                }
-            }
-            for (int j = 0; j < NewImage.Width; ++j)
-            {
-                for (int k = 0; k < NewImage.Height; ++k)
-                {
-                    NewImage.SetPixel(j, k, NewImageColor[j, k]);
-                }
-            }
-            NewImage.Save(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+            //Bitmap NewImage = new Bitmap(Image.Width, Image.Height);
+            //Color[,] NewImageColor = new Color[NewImage.Width, NewImage.Height];
+            //for (int j = 0; j < NewImage.Width; ++j)
+            //{
+            //    for (int k = 0; k < NewImage.Height; ++k)
+            //    {
+            //        NewImageColor[j, k] = NewImage.GetPixel(j, k);
+            //    }
+            //}
+            ////Построение изображения из деревьев
+            //for (int i = 0; i < 10; ++i)
+            //{
+            //    for (int j = 0; j < range_num_width; ++j)
+            //    {
+            //        for (int k = 0; k < range_num_height; ++k)
+            //        {
+            //            RangeTree[j, k].DrawTree(RangeTree[j, k], DomainBlocks, NewImageColor);
+            //        }
+            //    }
+            //}
+            //for (int j = 0; j < NewImage.Width; ++j)
+            //{
+            //    for (int k = 0; k < NewImage.Height; ++k)
+            //    {
+            //        NewImage.SetPixel(j, k, NewImageColor[j, k]);
+            //    }
+            //}
+            //NewImage.Save(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
             bw.Close();
         }
-        static public void NewQuadDecompression()
+        //Работает не так, как нужно
+        static public void QuadDecompression()
         {
             byte[] BytesFile = File.ReadAllBytes(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Quad Compression");
             int FileCount = 0;
@@ -1068,13 +1103,20 @@ namespace NewFractalCompression.Code
             Tmp = MyConverter.ReadByte(BytesFile, 2, 4);
             int Image_height = BitConverter.ToInt16(Tmp, 0) * Scale;
             //+
-
             FileCount += 2;
+
             Tmp = MyConverter.ReadByte(BytesFile, 4, 5);
             int range_block_size = Tmp[0] * Scale;
-            //+
-     
+            //+    
             FileCount += 1;
+
+            Tmp = MyConverter.ReadByte(BytesFile, 5, 9);
+            FileCount += 4;
+            int ListSize = BitConverter.ToInt32(Tmp, 0);
+            //System.Console.WriteLine(Image_width);
+            //System.Console.WriteLine(Image_height);
+            //System.Console.WriteLine(range_block_size);
+            //System.Console.WriteLine(ListSize);
             Bitmap NewImage = new Bitmap(Image_width, Image_height);
             Color[,] NewImageColor = new Color[NewImage.Width, NewImage.Height];
             BrightnessImage = new double[NewImage.Width, NewImage.Height];
@@ -1130,18 +1172,13 @@ namespace NewFractalCompression.Code
                     }
                 }
             }
+            List<Object.Coefficients> ListCoeff = new List<Object.Coefficients>();
             Object.Coefficients Coeff = new Object.Coefficients();
-            int blI = 0, blJ = -1;
-            while (Tmp != null)
+            for (int i = 0; i < ListSize; ++i)
             {
-                if (BytesFile.Length == FileCount)
-                    break;
                 Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 1);
                 Coeff.Depth = Tmp[0];
                 ++FileCount;
-
-                if (Tmp == null)
-                    break;
 
                 Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 1);
                 Coeff.X = Tmp[0];
@@ -1158,27 +1195,29 @@ namespace NewFractalCompression.Code
                 Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 2);
                 Coeff.shiftG = BitConverter.ToInt16(Tmp, 0);
                 FileCount += 2;
+
                 Tmp = MyConverter.ReadByte(BytesFile, FileCount, FileCount + 2);
                 Coeff.shiftB = BitConverter.ToInt16(Tmp, 0);
                 FileCount += 2;
-
-                RangeTree[blI, blJ].AddCoeff(RangeTree[blI, blJ], Coeff);
-                System.Console.WriteLine(blJ + " " + blI);
-                if (Coeff.Depth < 0)
+                ListCoeff.Add(Coeff);
+            }
+            int blI = 0, blJ = -1;
+            for (int i = 0; i < ListCoeff.Count; ++i)
+            {
+                PrintCoefficients(ListCoeff[i]);
+            }
+            for (int i = 0; i < ListCoeff.Count; ++i)
+            {
+                if (ListCoeff[i].Depth < 0)
                 {
                     ++blJ;
+                    if (blJ == range_num_height)
+                    {
+                        ++blI;
+                        blJ = 0;
+                    }
                 }
-                if (blJ == range_num_height - 1)
-                {
-                    ++blI;
-                }
-            }
-            for (int j = 0; j < NewImage.Width; ++j)
-            {
-                for (int k = 0; k < NewImage.Height; ++k)
-                {
-                    NewImageColor[j, k] = NewImage.GetPixel(j, k);
-                }
+                RangeTree[blI, blJ].AddCoeff(RangeTree[blI, blJ], ListCoeff[i]);
             }
             //Построение изображения из деревьев
             for (int i = 0; i < 10; ++i)
@@ -1187,10 +1226,8 @@ namespace NewFractalCompression.Code
                 {
                     for (int k = 0; k < range_num_height; ++k)
                     {
-                        System.Console.WriteLine(i + " " + j);
                         RangeTree[j, k].DrawTree(RangeTree[j, k], DomainBlocks, NewImageColor);
                     }
-                    System.Console.WriteLine("-----------");
                 }
             }
             for (int j = 0; j < NewImage.Width; ++j)
@@ -1244,7 +1281,7 @@ namespace NewFractalCompression.Code
                 }
             }
             //Основной параметр, отвечающий за размеры ранговых блоков
-            range_block_size = 16;
+            range_block_size = 2;
             //Создаём ранговые блоки
             range_num_width = Image.Width / range_block_size;
             range_num_height = Image.Height / range_block_size;

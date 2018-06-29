@@ -26,26 +26,26 @@ namespace NewFractalCompression.Code
             //System.Console.WriteLine();
             //CompressionClass.CheckRotate(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\lena gray.bmp");
 
-            Comsw.Start();
-            CompressionClass.NewQuadCompression(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
-            Comsw.Stop();
-            System.Console.WriteLine("Квадродеревья: " + (Comsw.Elapsed));
+            //Comsw.Start();
+            //CompressionClass.QuadCompression(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
+            //Comsw.Stop();
+            //System.Console.WriteLine("Квадродеревья: " + (Comsw.Elapsed));
 
             //Decsw.Start();
-            //CompressionClass.NewQuadDecompression();
+            //CompressionClass.QuadDecompression();
             //Decsw.Stop();
             //System.Console.WriteLine("Декомпрессия: " + (Decsw.Elapsed));
 
-            //System.Console.WriteLine("Обычное сжатие: ");
-            //Comsw.Start();
-            //CompressionClass.NewCompression(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
-            //Comsw.Stop();
-            //System.Console.WriteLine((Comsw.Elapsed));
+            System.Console.WriteLine("Обычное сжатие: ");
+            Comsw.Start();
+            CompressionClass.NewCompression(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
+            Comsw.Stop();
+            System.Console.WriteLine((Comsw.Elapsed));
 
-            //Decsw.Start();
-            //CompressionClass.NewColorDecompression();
-            //Decsw.Stop();
-            //System.Console.WriteLine((Decsw.Elapsed));
+            Decsw.Start();
+            CompressionClass.NewColorDecompression();
+            Decsw.Stop();
+            System.Console.WriteLine((Decsw.Elapsed));
 
             //FileInfo Fi = new FileInfo(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Compression");
             //Post.Compress(Fi);
