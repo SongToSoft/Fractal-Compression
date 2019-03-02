@@ -43,3 +43,18 @@ C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCo
 C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.GLControl.xml
 C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.Properties.Resources.resources
 C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csproj.GenerateResource.Cache
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csprojAssemblyReference.cache
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.Properties.Resources.resources
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csproj.GenerateResource.cache
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csproj.CoreCompileInputs.cache
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.exe
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.pdb
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.exe.config
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.exe
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\NewFractalCompression.pdb
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.GLControl.dll
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\Cloo.xml
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\OpenCLTemplate.xml
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.xml
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\bin\Debug\OpenTK.GLControl.xml
+C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\obj\Debug\NewFractalCompression.csproj.CopyComplete

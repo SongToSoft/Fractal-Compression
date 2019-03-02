@@ -9,48 +9,32 @@ namespace NewFractalCompression.Code
     {
         static void Main(string[] args)
         {
-            System.Diagnostics.Stopwatch Comsw = new Stopwatch();
-            System.Diagnostics.Stopwatch Decsw = new Stopwatch();
+            System.Diagnostics.Stopwatch comSw = new Stopwatch();
+            System.Diagnostics.Stopwatch decSw = new Stopwatch();
 
-            //Comsw.Start();
-            //CompressionClass.Compression(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
-            //Comsw.Stop();
-            //System.Console.WriteLine((Comsw.Elapsed));
+            System.Console.WriteLine("Classic compression: ");
+            comSw.Start();
+            BlockCompression.Compression(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
+            comSw.Stop();
+            System.Console.WriteLine((comSw.Elapsed));
 
-            //Decsw.Start();
-            //CompressionClass.ColorDecompression();
-            ////CompressionClass.BlackDecompression();
-            //Decsw.Stop();
-            //System.Console.WriteLine((Decsw.Elapsed));
+            decSw.Start();
+            BlockCompression.ColorDecompression();
+            decSw.Stop();
+            System.Console.WriteLine((decSw.Elapsed));
 
-            //System.Console.WriteLine();
-            //CompressionClass.CheckRotate(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\lena gray.bmp");
 
-            //Comsw.Start();
-            //CompressionClass.QuadCompression(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
-            //Comsw.Stop();
-            //System.Console.WriteLine("Квадродеревья: " + (Comsw.Elapsed));
+            System.Console.WriteLine("Quad Tree compression: ");
+            comSw.Start();
+            QuadTreeCompression.Compression(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
+            comSw.Stop();
+            System.Console.WriteLine((comSw.Elapsed));
 
-            //Decsw.Start();
-            //CompressionClass.QuadDecompression();
-            //Decsw.Stop();
-            //System.Console.WriteLine("Декомпрессия: " + (Decsw.Elapsed));
+            decSw.Start();
+            QuadTreeCompression.FakeDecompression();
+            decSw.Stop();
+            System.Console.WriteLine((decSw.Elapsed));
 
-            System.Console.WriteLine("Обычное сжатие: ");
-            Comsw.Start();
-            CompressionClass.NewCompression(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
-            Comsw.Stop();
-            System.Console.WriteLine((Comsw.Elapsed));
-
-            Decsw.Start();
-            CompressionClass.NewColorDecompression();
-            Decsw.Stop();
-            System.Console.WriteLine((Decsw.Elapsed));
-
-            //FileInfo Fi = new FileInfo(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\Compression");
-            //Post.Compress(Fi);
-            //FileInfo Fo= new FileInfo(@"C:\Users\Dima\Documents\Фрактальное сжатие\Fractal\NewFractalCompression\NewFractalCompression\nature.bmp.cmp");
-            //Post.Decompress(Fo);
             System.Console.WriteLine("Please, press enter");
             Console.ReadKey();
         }

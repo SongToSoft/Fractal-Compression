@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NewFractalCompression.Code
 {
-    static class Post
+    static class PostProcessing
     {
         static public void Compress(FileInfo fi)
         {
@@ -40,6 +40,7 @@ namespace NewFractalCompression.Code
                 }
             }
         }
+
         static public void Decompress(FileInfo fi)
         {
             // Get the stream of the source file.
@@ -66,12 +67,13 @@ namespace NewFractalCompression.Code
                 }
             }
         }
-        static public int GetPow(int Num)
+
+        static public int GetPow(int num)
         {
-            for (int i = 0; i < Num; ++i)
+            for (int i = 0; i < num; ++i)
             {
-                int Checker = (int)Math.Pow((2), i);
-                if (Checker == Num)
+                int checker = (int)Math.Pow((2), i);
+                if (checker == num)
                     return i;
             }
             return 1;

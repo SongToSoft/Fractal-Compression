@@ -11,90 +11,90 @@ namespace NewFractalCompression.Code
 {
     class BlockTree
     {
-        public Object.Block MainBlock;
+        public Object.Block mainBlock;
         //Узлы блока
-        public BlockTree UL;
-        public BlockTree UR;
-        public BlockTree DL;
-        public BlockTree DR;
+        public BlockTree ul;
+        public BlockTree ur;
+        public BlockTree dl;
+        public BlockTree dr;
         //Глубина дерева
-        public int Depth = 0;
-        public double CurrentDistance = double.MaxValue;
+        public int depth = 0;
+        public double currentDistance = double.MaxValue;
         //Конструктор дерева
-        public BlockTree(Object.Block block, int BlockSize)
+        public BlockTree(Object.Block block, int blockSize)
         {
-            MainBlock = block;
-            MainBlock.X = block.X;
-            MainBlock.Y = block.Y;
-            MainBlock.SumR = block.SumR;
-            MainBlock.SumG = block.SumG;
-            MainBlock.SumB = block.SumB;
-            MainBlock.BlockSize = BlockSize;
-            MainBlock.Depth = CompressionClass.NumLock;
-            if (CompressionClass.NumLock == (-1))
+            mainBlock = block;
+            mainBlock.X = block.X;
+            mainBlock.Y = block.Y;
+            mainBlock.SumR = block.SumR;
+            mainBlock.SumG = block.SumG;
+            mainBlock.SumB = block.SumB;
+            mainBlock.BlockSize = blockSize;
+            mainBlock.Depth = QuadTreeCompression.numLock;
+            if (QuadTreeCompression.numLock == (-1))
             {
-                CompressionClass.NumLock = 2;
+                QuadTreeCompression.numLock = 2;
             }
             else
             {
-                ++CompressionClass.NumLock;
+                ++QuadTreeCompression.numLock;
             }
             //Для ранговых блоковы
-            if (MainBlock.BlockSize > 2)
+            if (mainBlock.BlockSize > 2)
             {
-                Object.Block tmpBlock = CompressionClass.CreateBlockRange(block.X, block.Y, CompressionClass.ClassImageColor, block.BlockSize / 2, CompressionClass.BrightnessImage);
-                UL = new BlockTree(tmpBlock, tmpBlock.BlockSize);
+                Object.Block tmpBlock = QuadTreeCompression.CreateBlockRange(block.X, block.Y, QuadTreeCompression.classImageColor, block.BlockSize / 2, QuadTreeCompression.brightnessImage);
+                ul = new BlockTree(tmpBlock, tmpBlock.BlockSize);
 
-                tmpBlock = CompressionClass.CreateBlockRange(block.X + block.BlockSize / 2, block.Y, CompressionClass.ClassImageColor, block.BlockSize / 2, CompressionClass.BrightnessImage);
-                UR = new BlockTree(tmpBlock, tmpBlock.BlockSize);
+                tmpBlock = QuadTreeCompression.CreateBlockRange(block.X + block.BlockSize / 2, block.Y, QuadTreeCompression.classImageColor, block.BlockSize / 2, QuadTreeCompression.brightnessImage);
+                ur = new BlockTree(tmpBlock, tmpBlock.BlockSize);
 
-                tmpBlock = CompressionClass.CreateBlockRange(block.X, block.Y + block.BlockSize / 2, CompressionClass.ClassImageColor, block.BlockSize / 2, CompressionClass.BrightnessImage);
-                DL = new BlockTree(tmpBlock, tmpBlock.BlockSize);
+                tmpBlock = QuadTreeCompression.CreateBlockRange(block.X, block.Y + block.BlockSize / 2, QuadTreeCompression.classImageColor, block.BlockSize / 2, QuadTreeCompression.brightnessImage);
+                dl = new BlockTree(tmpBlock, tmpBlock.BlockSize);
 
-                tmpBlock = CompressionClass.CreateBlockRange(block.X + block.BlockSize / 2, block.Y + block.BlockSize / 2, CompressionClass.ClassImageColor, block.BlockSize / 2, CompressionClass.BrightnessImage);
-                DR = new BlockTree(tmpBlock, tmpBlock.BlockSize);
+                tmpBlock = QuadTreeCompression.CreateBlockRange(block.X + block.BlockSize / 2, block.Y + block.BlockSize / 2, QuadTreeCompression.classImageColor, block.BlockSize / 2, QuadTreeCompression.brightnessImage);
+                dr = new BlockTree(tmpBlock, tmpBlock.BlockSize);
             }
         }
         //Вывод структуры дерева
-        public void PrintTree(BlockTree CurrentBlock, int CS)
+        public void PrintTree(BlockTree currentBlock, int cs)
         {
-            if (CS == 0)
-                System.Console.WriteLine("MaintBlock: Depth = " + CurrentBlock.MainBlock.Depth + " " + CurrentBlock.MainBlock.X + " " + CurrentBlock.MainBlock.Y);
-            if (CS == 1)
-                System.Console.WriteLine("UL: Depth = " + CurrentBlock.MainBlock.Depth + " " + CurrentBlock.MainBlock.X + " " + CurrentBlock.MainBlock.Y);
-            if (CS == 2)
-                System.Console.WriteLine("UR: Depth = " + CurrentBlock.MainBlock.Depth + " " + CurrentBlock.MainBlock.X + " " + CurrentBlock.MainBlock.Y);
-            if (CS == 3)
-                System.Console.WriteLine("DL: Depth = " + CurrentBlock.MainBlock.Depth + " " + CurrentBlock.MainBlock.X + " " + CurrentBlock.MainBlock.Y);
-            if (CS == 4)
-                System.Console.WriteLine("DR: Depth = " + CurrentBlock.MainBlock.Depth + " " + CurrentBlock.MainBlock.X + " " + CurrentBlock.MainBlock.Y);
+            if (cs == 0)
+                System.Console.WriteLine("MaintBlock: Depth = " + currentBlock.mainBlock.Depth + " " + currentBlock.mainBlock.X + " " + currentBlock.mainBlock.Y);
+            if (cs == 1)
+                System.Console.WriteLine("UL: Depth = " + currentBlock.mainBlock.Depth + " " + currentBlock.mainBlock.X + " " + currentBlock.mainBlock.Y);
+            if (cs == 2)
+                System.Console.WriteLine("UR: Depth = " + currentBlock.mainBlock.Depth + " " + currentBlock.mainBlock.X + " " + currentBlock.mainBlock.Y);
+            if (cs == 3)
+                System.Console.WriteLine("DL: Depth = " + currentBlock.mainBlock.Depth + " " + currentBlock.mainBlock.X + " " + currentBlock.mainBlock.Y);
+            if (cs == 4)
+                System.Console.WriteLine("DR: Depth = " + currentBlock.mainBlock.Depth + " " + currentBlock.mainBlock.X + " " + currentBlock.mainBlock.Y);
 
-            if (CurrentBlock.UL != null)
+            if (currentBlock.ul != null)
             {
-                PrintTree(CurrentBlock.UL, 1);
+                PrintTree(currentBlock.ul, 1);
             }
-            if (CurrentBlock.UR != null)
+            if (currentBlock.ur != null)
             {
-                PrintTree(CurrentBlock.UR, 2);
+                PrintTree(currentBlock.ur, 2);
             }
-            if (CurrentBlock.DL != null)
+            if (currentBlock.dl != null)
             {
-                PrintTree(CurrentBlock.DL, 3);
+                PrintTree(currentBlock.dl, 3);
             }
-            if (CurrentBlock.DR != null)
+            if (currentBlock.dr != null)
             {
-                PrintTree(CurrentBlock.DR, 4);
+                PrintTree(currentBlock.dr, 4);
             }
         }
         //Обход дерева и нахождение для нужных узлов коэффициентов
-        public void RoundTree(BlockTree RangeTree, Object.BlockArray[] DomainArray, Color[,] ClassImageColor, int range_block_size)
+        public void RoundTree(BlockTree rangeTree, Object.BlockArray[] domainArray, Color[,] classImageColor, int range_block_size)
         {
-            if (!(CompressionClass.CheckMonotoneBlock(RangeTree.MainBlock)) && (RangeTree.MainBlock.BlockSize > 2))
+            if (!(QuadTreeCompression.CheckMonotoneBlock(rangeTree.mainBlock)) && (rangeTree.mainBlock.BlockSize > 2))
             {
-                RoundTree(RangeTree.UL, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
-                RoundTree(RangeTree.UR, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
-                RoundTree(RangeTree.DL, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
-                RoundTree(RangeTree.DR, DomainArray, ClassImageColor, RangeTree.MainBlock.BlockSize);
+                RoundTree(rangeTree.ul, domainArray, classImageColor, rangeTree.mainBlock.BlockSize);
+                RoundTree(rangeTree.ur, domainArray, classImageColor, rangeTree.mainBlock.BlockSize);
+                RoundTree(rangeTree.dl, domainArray, classImageColor, rangeTree.mainBlock.BlockSize);
+                RoundTree(rangeTree.dr, domainArray, classImageColor, rangeTree.mainBlock.BlockSize);
             }
             else
             {
@@ -107,21 +107,21 @@ namespace NewFractalCompression.Code
                 bool oneflag = false;
                 //System.Console.WriteLine("Depth: " + RangeTree.Depth + " " + RangeTree.MainBlock.BlockSize + " " + DomainArray[CurrentSize].BlockSize);
                 int CurrentSize = 0;
-                for (int i = 0; i < DomainArray.Length; ++i)
+                for (int i = 0; i < domainArray.Length; ++i)
                 {
-                    if ((DomainArray[i].BlockSize) == (RangeTree.MainBlock.BlockSize * 2))
+                    if ((domainArray[i].BlockSize) == (rangeTree.mainBlock.BlockSize * 2))
                     {
                         CurrentSize = i;
                     }
                 }
-                for (int k = 0; k < DomainArray[CurrentSize].num_width; ++k)
+                for (int k = 0; k < domainArray[CurrentSize].num_width; ++k)
                 {
-                    for (int l = 0; l < DomainArray[CurrentSize].num_height; ++l)
+                    for (int l = 0; l < domainArray[CurrentSize].num_height; ++l)
                     {
-                        double shiftR = CompressionClass.Shift(RangeTree.MainBlock, DomainArray[CurrentSize].Blocks[k, l], RangeTree.MainBlock.BlockSize, 0);
-                        double shiftG = CompressionClass.Shift(RangeTree.MainBlock, DomainArray[CurrentSize].Blocks[k, l], RangeTree.MainBlock.BlockSize, 1);
-                        double shiftB = CompressionClass.Shift(RangeTree.MainBlock, DomainArray[CurrentSize].Blocks[k, l], RangeTree.MainBlock.BlockSize, 2);
-                        double distance = Metrics.DistanceQuad(ClassImageColor, RangeTree.MainBlock, DomainArray[CurrentSize].Blocks[k, l], RangeTree.MainBlock.BlockSize, shiftR);
+                        double shiftR = QuadTreeCompression.Shift(rangeTree.mainBlock, domainArray[CurrentSize].Blocks[k, l], rangeTree.mainBlock.BlockSize, 0);
+                        double shiftG = QuadTreeCompression.Shift(rangeTree.mainBlock, domainArray[CurrentSize].Blocks[k, l], rangeTree.mainBlock.BlockSize, 1);
+                        double shiftB = QuadTreeCompression.Shift(rangeTree.mainBlock, domainArray[CurrentSize].Blocks[k, l], rangeTree.mainBlock.BlockSize, 2);
+                        double distance = Metrics.DistanceQuad(classImageColor, rangeTree.mainBlock, domainArray[CurrentSize].Blocks[k, l], rangeTree.mainBlock.BlockSize, shiftR);
                         if (distance < 1000000)
                         {
                             oneflag = true;
@@ -152,17 +152,17 @@ namespace NewFractalCompression.Code
                         break;
                 }
 
-                RangeTree.MainBlock.Active = true;
-                RangeTree.MainBlock.Coeff.X = current_x;
-                RangeTree.MainBlock.Coeff.Y = current_y;
-                RangeTree.MainBlock.Coeff.shiftR = (int)current_shiftR;
-                RangeTree.MainBlock.Coeff.shiftG = (int)current_shiftG;
-                RangeTree.MainBlock.Coeff.shiftB = (int)current_shiftB;
-                RangeTree.MainBlock.Coeff.Depth = RangeTree.MainBlock.Depth;
-                if (CompressionClass.BlockChecker == 0)
-                    RangeTree.MainBlock.Coeff.Depth *= (-1);
-                ++CompressionClass.BlockChecker;
-                CompressionClass.ListCoeff.Add(RangeTree.MainBlock.Coeff);
+                rangeTree.mainBlock.Active = true;
+                rangeTree.mainBlock.Coeff.X = current_x;
+                rangeTree.mainBlock.Coeff.Y = current_y;
+                rangeTree.mainBlock.Coeff.shiftR = (int)current_shiftR;
+                rangeTree.mainBlock.Coeff.shiftG = (int)current_shiftG;
+                rangeTree.mainBlock.Coeff.shiftB = (int)current_shiftB;
+                rangeTree.mainBlock.Coeff.Depth = rangeTree.mainBlock.Depth;
+                if (QuadTreeCompression.blockChecker == 0)
+                    rangeTree.mainBlock.Coeff.Depth *= (-1);
+                ++QuadTreeCompression.blockChecker;
+                QuadTreeCompression.listCoeff.Add(rangeTree.mainBlock.Coeff);
                 //System.Console.WriteLine(RangeTree.MainBlock.Depth);
                 //Запись в файл всех нужные чисел, а так же глубину нахождения узла в дереве
                 //Byte[] D = BitConverter.GetBytes(RangeTree.MainBlock.Depth);
@@ -181,81 +181,81 @@ namespace NewFractalCompression.Code
             }
         }
         //Добавить коэффициент в дерево
-        public void AddCoeff(BlockTree RangeTree, Object.Coefficients Coeff)
+        public void AddCoeff(BlockTree rangeTree, Object.Coefficients coeff)
         {
-            if (Coeff.Depth < 0)
+            if (coeff.Depth < 0)
             {
-                Coeff.Depth *= (-1);
+                coeff.Depth *= (-1);
             }
-            if (Coeff.Depth == RangeTree.MainBlock.Depth)
+            if (coeff.Depth == rangeTree.mainBlock.Depth)
             {
-                RangeTree.MainBlock.Active = true;
-                RangeTree.MainBlock.Coeff.X = Coeff.X;
-                RangeTree.MainBlock.Coeff.Y = Coeff.Y;
-                RangeTree.MainBlock.Coeff.shiftR = Coeff.shiftR;
-                RangeTree.MainBlock.Coeff.shiftG = Coeff.shiftG;
-                RangeTree.MainBlock.Coeff.shiftB = Coeff.shiftB;
+                rangeTree.mainBlock.Active = true;
+                rangeTree.mainBlock.Coeff.X = coeff.X;
+                rangeTree.mainBlock.Coeff.Y = coeff.Y;
+                rangeTree.mainBlock.Coeff.shiftR = coeff.shiftR;
+                rangeTree.mainBlock.Coeff.shiftG = coeff.shiftG;
+                rangeTree.mainBlock.Coeff.shiftB = coeff.shiftB;
             }
             else
             {
-                if (RangeTree.UL != null)
-                    AddCoeff(RangeTree.UL, Coeff);
-                if (RangeTree.UR != null)
-                    AddCoeff(RangeTree.UR, Coeff);
-                if (RangeTree.DL != null)
-                    AddCoeff(RangeTree.DL, Coeff);
-                if (RangeTree.DR != null)
-                    AddCoeff(RangeTree.DR, Coeff);
+                if (rangeTree.ul != null)
+                    AddCoeff(rangeTree.ul, coeff);
+                if (rangeTree.ur != null)
+                    AddCoeff(rangeTree.ur, coeff);
+                if (rangeTree.dl != null)
+                    AddCoeff(rangeTree.dl, coeff);
+                if (rangeTree.dr != null)
+                    AddCoeff(rangeTree.dr, coeff);
             }
         }
         //Построить по дереву изображение
-        public void DrawTree(BlockTree RangeTree, Object.BlockArray[] DomainArray, Color[,] NewImageColor)
+        public void DrawTree(BlockTree rangeTree, Object.BlockArray[] domainArray, Color[,] newImageColor)
         {
-            if (RangeTree.MainBlock.Active == false)
+            if (rangeTree.mainBlock.Active == false)
             {
-                DrawTree(RangeTree.UL, DomainArray, NewImageColor);
-                DrawTree(RangeTree.UR, DomainArray, NewImageColor);
-                DrawTree(RangeTree.DL, DomainArray, NewImageColor);
-                DrawTree(RangeTree.DR, DomainArray, NewImageColor);
+                DrawTree(rangeTree.ul, domainArray, newImageColor);
+                DrawTree(rangeTree.ur, domainArray, newImageColor);
+                DrawTree(rangeTree.dl, domainArray, newImageColor);
+                DrawTree(rangeTree.dr, domainArray, newImageColor);
             }
             else
             {
-                ++CompressionClass.NumLock;
+                ++BlockCompression.numLock;
                 //System.Console.WriteLine(CompressionClass.NumLock);
-                int CurrentSize = 0;
-                for (int i = 0; i < DomainArray.Length; ++i)
+                int currentSize = 0;
+                for (int i = 0; i < domainArray.Length; ++i)
                 {
-                    if ((DomainArray[i].BlockSize) == (RangeTree.MainBlock.BlockSize * 2))
+                    if ((domainArray[i].BlockSize) == (rangeTree.mainBlock.BlockSize * 2))
                     {
                         //System.Console.WriteLine("!!!!");
-                        CurrentSize = i;
+                        currentSize = i;
                     }
                 }              
-                Object.Block DomainBlock = DomainArray[CurrentSize].Blocks[RangeTree.MainBlock.Coeff.X, RangeTree.MainBlock.Coeff.Y];
-                for (int pix_x = 0; pix_x < RangeTree.MainBlock.BlockSize; ++pix_x)
+                Object.Block domainBlock = domainArray[currentSize].Blocks[rangeTree.mainBlock.Coeff.X, rangeTree.mainBlock.Coeff.Y];
+                for (int pix_x = 0; pix_x < rangeTree.mainBlock.BlockSize; ++pix_x)
                 {
-                    for (int pix_y = 0; pix_y < RangeTree.MainBlock.BlockSize; ++pix_y)
+                    for (int pix_y = 0; pix_y < rangeTree.mainBlock.BlockSize; ++pix_y)
                     {
-                        Color color = NewImageColor[DomainBlock.X + (pix_x * 2), DomainBlock.Y + (pix_y * 2)];
+                        Color color = newImageColor[domainBlock.X + (pix_x * 2), domainBlock.Y + (pix_y * 2)];
 
-                        int R = (int)(0.75 * color.R + (RangeTree.MainBlock.Coeff.shiftR));
-                        if (R < 0)
-                            R = 0;
-                        if (R > 255)
-                            R = 255;
-                        int G = (int)(0.75 * color.G + (RangeTree.MainBlock.Coeff.shiftG));
-                        if (G < 0)
-                            G = 0;
-                        if (G > 255)
-                            G = 255;
-                        int B = (int)(0.75 * color.B + (RangeTree.MainBlock.Coeff.shiftB));
-                        if (B < 0)
-                            B = 0;
-                        if (B > 255)
-                            B = 255;
+                        int r = (int)(0.75 * color.R + (rangeTree.mainBlock.Coeff.shiftR));
+                        if (r < 0)
+                            r = 0;
+                        if (r > 255)
+                            r = 255;
+                        int g = (int)(0.75 * color.G + (rangeTree.mainBlock.Coeff.shiftG));
+                        if (g < 0)
+                            g = 0;
+                        if (g > 255)
+                            g = 255;
+                        int b = (int)(0.75 * color.B + (rangeTree.mainBlock.Coeff.shiftB));
+                        if (b < 0)
+                            b = 0;
+                        if (b > 255)
+                            b = 255;
 
-                        Color Newcolor = Color.FromArgb(R, G, B);
-                        NewImageColor[RangeTree.MainBlock.X + pix_x, RangeTree.MainBlock.Y + pix_y] = Newcolor;
+                        Color Newcolor = Color.FromArgb(r, g, b);
+                        newImageColor[rangeTree.mainBlock.X + pix_x, rangeTree.mainBlock.Y + pix_y] = Newcolor;
                     }
                 }
             }
