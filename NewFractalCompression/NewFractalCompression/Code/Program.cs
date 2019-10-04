@@ -12,21 +12,21 @@ namespace NewFractalCompression.Code
             System.Diagnostics.Stopwatch comSw = new Stopwatch();
             System.Diagnostics.Stopwatch decSw = new Stopwatch();
 
-            System.Console.WriteLine("Classic compression: ");
-            comSw.Start();
-            BlockCompression.Compression(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
-            comSw.Stop();
-            System.Console.WriteLine((comSw.Elapsed));
+            //System.Console.WriteLine("Classic compression: ");
+            //comSw.Start();
+            //BlockCompression.Compression(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
+            //comSw.Stop();
+            //System.Console.WriteLine((comSw.Elapsed));
 
-            decSw.Start();
-            BlockCompression.ColorDecompression();
-            decSw.Stop();
-            System.Console.WriteLine((decSw.Elapsed));
+            //decSw.Start();
+            //BlockCompression.ColorDecompression();
+            //decSw.Stop();
+            //System.Console.WriteLine((decSw.Elapsed));
 
 
             System.Console.WriteLine("Quad Tree compression: ");
             comSw.Start();
-            QuadTreeCompression.Compression(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Sea New.bmp", "Color");
+            QuadTreeCompression.Compression(@"C:\Users\Admin\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\messi.bmp", "Color");
             comSw.Stop();
             System.Console.WriteLine((comSw.Elapsed));
 

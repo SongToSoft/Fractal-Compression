@@ -70,7 +70,7 @@ namespace NewFractalCompression.Code
                 }
             }
             //Создаём ранговое дерево
-            range_block_size = 16;
+            range_block_size = 128;
             range_num_width = image.Width / range_block_size;
             range_num_height = image.Height / range_block_size;
             rangeArray = new Object.Block[range_num_width, range_num_height];
@@ -126,7 +126,7 @@ namespace NewFractalCompression.Code
                 }
             }
 
-            bw = new BinaryWriter(File.Open(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Quad Compression", FileMode.Create));
+            bw = new BinaryWriter(File.Open(@"C:\Users\Admin\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Quad Compression", FileMode.Create));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(image.Width), 2));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(image.Height), 2));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(range_block_size), 1));
@@ -142,12 +142,12 @@ namespace NewFractalCompression.Code
                 Byte[] SG = BitConverter.GetBytes(listCoeff[i].shiftG);
                 Byte[] SB = BitConverter.GetBytes(listCoeff[i].shiftB);
                 //System.Console.WriteLine(ListCoeff[i].Depth + " -- " + D[0]);
-                //bw.Write(MyConverter.Convert(D, 1));
-                //bw.Write(MyConverter.Convert(X, 1));
-                //bw.Write(MyConverter.Convert(Y, 1));
-                //bw.Write(MyConverter.Convert(SR, 2));
-                //bw.Write(MyConverter.Convert(SG, 2));
-                //bw.Write(MyConverter.Convert(SB, 2));
+                bw.Write(MyConverter.Convert(D, 1));
+                bw.Write(MyConverter.Convert(X, 1));
+                bw.Write(MyConverter.Convert(Y, 1));
+                bw.Write(MyConverter.Convert(SR, 2));
+                bw.Write(MyConverter.Convert(SG, 2));
+                bw.Write(MyConverter.Convert(SB, 2));
             }
             bw.Close();
         }
@@ -182,7 +182,7 @@ namespace NewFractalCompression.Code
                     newImage.SetPixel(j, k, newImageColor[j, k]);
                 }
             }
-            newImage.Save(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Quad file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+            newImage.Save(@"C:\Users\Admin\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Quad file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
         }
 
         static public void Decompression()

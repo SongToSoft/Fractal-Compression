@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace NewFractalCompression.Code
 {
+    [Obsolete("BlockCompression is deprecated, please use QuadTreeCompression.")]
     class BlockCompression : AbstractCompression
     {
         //Отразить блок по вертикали
