@@ -5,6 +5,7 @@ using System.IO;
 
 namespace NewFractalCompression.Code
 {
+    [Obsolete("BlockCompression is deprecated, please use QuadTreeCompression.")]
     class QuadTreeCompression : AbstractCompression
     {
         private static int imageWidth, imageHeigth;
@@ -115,7 +116,7 @@ namespace NewFractalCompression.Code
                     }
                 }
             }
-            //listCoeff = new List<Object.Coefficients>();
+            listCoeff = new List<Object.Coefficients>();
             //Обход всех деревьев и нахождение для нужных коэффициентов преобразования, а так же выписывание их в файл
             for (int i = 0; i < range_num_width; ++i)
             {
@@ -126,42 +127,34 @@ namespace NewFractalCompression.Code
                 }
             }
 
-            for (int i = 0; i < range_num_width; ++i)
-            {
-                for (int j = 0; j < range_num_height; ++j)
-                {
-                    rangeTree[i, j].PrintTree(rangeTree[i, j], 0);
-                }
-            }
-
             bw = new BinaryWriter(File.Open(@"C:\Users\Admin\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Quad Compression", FileMode.Create));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(image.Width), 2));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(image.Height), 2));
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(range_block_size), 1));
-            //bw.Write(MyConverter.Convert(BitConverter.GetBytes(listCoeff.Count), 4));
-            for (int i = 0; i < range_num_width; ++i)
-            {
-                for (int j = 0; j < range_num_height; ++j)
-                {
-                    rangeTree[i, j].PrintTree(rangeTree[i, j], 0);
-                }
-            }
+            bw.Write(MyConverter.Convert(BitConverter.GetBytes(listCoeff.Count), 4));
+            //for (int i = 0; i < range_num_width; ++i)
+            //{
+            //    for (int j = 0; j < range_num_height; ++j)
+            //    {
+            //        rangeTree[i, j].PrintTree(rangeTree[i, j], 0);
+            //    }
+            //}
             for (int i = 0; i < listCoeff.Count; ++i)
             {
                 //Запись в файл всех нужные чисел, а так же глубину нахождения узла в дереве
-                //Byte[] D = BitConverter.GetBytes(listCoeff[i].Depth);
-                //Byte[] X = BitConverter.GetBytes(listCoeff[i].X);
-                //Byte[] Y = BitConverter.GetBytes(listCoeff[i].Y);
-                //Byte[] SR = BitConverter.GetBytes(listCoeff[i].shiftR);
-                //Byte[] SG = BitConverter.GetBytes(listCoeff[i].shiftG);
-                //Byte[] SB = BitConverter.GetBytes(listCoeff[i].shiftB);
-                //System.Console.WriteLine(ListCoeff[i].Depth + " -- " + D[0]);
-                //bw.Write(MyConverter.Convert(D, 1));
-                //bw.Write(MyConverter.Convert(X, 1));
-                //bw.Write(MyConverter.Convert(Y, 1));
-                //bw.Write(MyConverter.Convert(SR, 2));
-                //bw.Write(MyConverter.Convert(SG, 2));
-                //bw.Write(MyConverter.Convert(SB, 2));
+                Byte[] D = BitConverter.GetBytes(listCoeff[i].Depth);
+                Byte[] X = BitConverter.GetBytes(listCoeff[i].X);
+                Byte[] Y = BitConverter.GetBytes(listCoeff[i].Y);
+                Byte[] SR = BitConverter.GetBytes(listCoeff[i].shiftR);
+                Byte[] SG = BitConverter.GetBytes(listCoeff[i].shiftG);
+                Byte[] SB = BitConverter.GetBytes(listCoeff[i].shiftB);
+                //System.Console.WriteLine(listCoeff[i].Depth + " -- " + D[0]);
+                bw.Write(MyConverter.Convert(D, 1));
+                bw.Write(MyConverter.Convert(X, 1));
+                bw.Write(MyConverter.Convert(Y, 1));
+                bw.Write(MyConverter.Convert(SR, 2));
+                bw.Write(MyConverter.Convert(SG, 2));
+                bw.Write(MyConverter.Convert(SB, 2));
             }
             bw.Close();
         }

@@ -221,13 +221,11 @@ namespace NewFractalCompression.Code
             else
             {
                 ++BlockCompression.numLock;
-                //System.Console.WriteLine(CompressionClass.NumLock);
                 int currentSize = 0;
                 for (int i = 0; i < domainArray.Length; ++i)
                 {
                     if ((domainArray[i].BlockSize) == (rangeTree.mainBlock.BlockSize * 2))
                     {
-                        //System.Console.WriteLine("!!!!");
                         currentSize = i;
                     }
                 }              
