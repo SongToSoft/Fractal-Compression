@@ -29,3 +29,5 @@ Original size 4705kb:
 ![oriinal](https://github.com/TakingAway/Fractal-Compression/blob/master/NewFractalCompression/NewFractalCompression/Example/2.bmp)
 
 In code exist method compress image with quad tree, that method more powerful than classic block system, but decompress methond not write correct.
+Quad file can compress file in range [maxValue, 2px] on any part of image.
+![quad](https://github.com/TakingAway/Fractal-Compression/blob/master/NewFractalCompression/NewFractalCompression/Example/Quad%20file.bmp)
