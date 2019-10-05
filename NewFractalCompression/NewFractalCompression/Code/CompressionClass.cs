@@ -204,7 +204,7 @@ namespace NewFractalCompression.Code
                 }
             }
             //Основной параметр, отвечающий за размеры ранговых блоков
-            range_block_size = 2;
+            range_block_size = 128;
             //Создаём ранговые блоки
             range_num_width = image.Width / range_block_size;
             range_num_height = image.Height / range_block_size;
@@ -233,7 +233,7 @@ namespace NewFractalCompression.Code
             //Общеее число преобразований
             block_all_num = colorflag * range_num_width * range_num_height;
             compressCoeff = new Object.Coefficients[range_num_width, range_num_height, 1];
-            BinaryWriter bw = new BinaryWriter(File.Open(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Compression", FileMode.Create));
+            BinaryWriter bw = new BinaryWriter(File.Open(@"C:\Users\Admin\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Compression", FileMode.Create));
             Parallel.For(0, range_num_width, FindCoefficients);
             //Выводим коэффиценты в файл
             bw.Write(MyConverter.Convert(BitConverter.GetBytes(image.Width), 2));
@@ -265,7 +265,7 @@ namespace NewFractalCompression.Code
 
         public static void ColorDecompression()
         {
-            byte[] BytesFile = File.ReadAllBytes(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Compression");
+            byte[] BytesFile = File.ReadAllBytes(@"C:\Users\Admin\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Compression");
             int fileCount = 0;
             //Коэффициент масштабирования
             int scale = 1;
@@ -389,7 +389,7 @@ namespace NewFractalCompression.Code
                     }
                 }
             }
-            newImage.Save(@"C:\Users\dbogdano\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Expanded file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
+            newImage.Save(@"C:\Users\Admin\Documents\GitHub\Fractal-Compression\NewFractalCompression\NewFractalCompression\Expanded file.bmp", System.Drawing.Imaging.ImageFormat.Bmp);
         }
 
     }
