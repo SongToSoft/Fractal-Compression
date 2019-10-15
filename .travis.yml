@@ -1,2 +1,2 @@
 language: csharp
-solution: NewFractalCompression.sln
+solution: NewFractalCompression/NewFractalCompression.sln
