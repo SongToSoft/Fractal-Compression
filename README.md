@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/TakingAway/Fractal-Compression.svg?branch=master)](https://travis-ci.org/TakingAway/Fractal-Compression)
+[![Build Status](https://travis-ci.org/SongToSoft/Fractal-Compression.svg?branch=master)](https://travis-ci.org/SongToSoft/Fractal-Compression)
 
 # Fractal-Compression
 Fractal Image Compression Algorithm
